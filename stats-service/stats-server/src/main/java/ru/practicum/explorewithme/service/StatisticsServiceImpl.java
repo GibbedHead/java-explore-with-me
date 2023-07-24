@@ -23,7 +23,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public void addHit(AddHitDto addHitDto) {
         statisticsRepository.save(
-                statisticsMapper.AddHitToStatistics(addHitDto)
+                statisticsMapper.addHitToStatistics(addHitDto)
         );
     }
 

@@ -6,5 +6,5 @@ import ru.practicum.explorewithme.model.Statistics;
 
 @Mapper(componentModel = "spring")
 public interface StatisticsMapper {
-    Statistics AddHitToStatistics(AddHitDto addHitDto);
+    Statistics addHitToStatistics(AddHitDto addHitDto);
 }
