@@ -15,6 +15,7 @@ services:
       - POSTGRES_DB=ewm-statistics
       - POSTGRES_USER=ewm-statistics
       - POSTGRES_PASSWORD=ewm-statistics
+    restart: on-failure
 
   stats-db:
     image: postgres:14-alpine
@@ -43,6 +44,7 @@ services:
       - POSTGRES_DB=ewm
       - POSTGRES_USER=ewm
       - POSTGRES_PASSWORD=ewm
+    restart: on-failure
 
   ewm-db:
     image: postgres:14-alpine
