@@ -1,15 +1,58 @@
 version: '3.1'
 services:
   stats-server:
+    build: stats-service/stats-server
+    image: stats-server
+    container_name: stats-server
     ports:
       - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - TZ:Europe/Moscow
+      - POSTGRES_HOST=stats-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=ewm-statistics
+      - POSTGRES_USER=ewm-statistics
+      - POSTGRES_PASSWORD=ewm-statistics
+    restart: on-failure
 
   stats-db:
     image: postgres:14-alpine
+    container_name: stats-db
+    ports:
+      - "9999:5432"
+    environment:
+      - POSTGRES_DB=ewm-statistics
+      - POSTGRES_USER=ewm-statistics
+      - POSTGRES_PASSWORD=ewm-statistics
+      - TZ:Europe/Moscow
 
   ewm-service:
+    build: ewm-service
+    image: ewm-service
+    container_name: ewm-service
     ports:
       - "8080:8080"
+    depends_on:
+      - ewm-db
+      - stats-server
+    environment:
+      - TZ:Europe/Moscow
+      - POSTGRES_HOST=ewm-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=ewm
+      - POSTGRES_USER=ewm
+      - POSTGRES_PASSWORD=ewm
+    restart: on-failure
 
   ewm-db:
     image: postgres:14-alpine
+    container_name: ewm-db
+    ports:
+      - "8888:5432"
+    environment:
+      - POSTGRES_DB=ewm
+      - POSTGRES_USER=ewm
+      - POSTGRES_PASSWORD=ewm
+      - TZ:Europe/Moscow
