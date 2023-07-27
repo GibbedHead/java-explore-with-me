@@ -34,6 +34,7 @@ services:
     container_name: ewm-service
     ports:
       - "8080:8080"
+      - "5005:5005"
     depends_on:
       - ewm-db
       - stats-server
@@ -44,6 +45,7 @@ services:
       - POSTGRES_DB=ewm
       - POSTGRES_USER=ewm
       - POSTGRES_PASSWORD=ewm
+      - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,address=*:5005,server=y,suspend=n"
     restart: on-failure
 
   ewm-db:

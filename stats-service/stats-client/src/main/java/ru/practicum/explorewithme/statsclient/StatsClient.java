@@ -20,10 +20,10 @@ import java.util.List;
 @Component
 @Slf4j
 public class StatsClient {
-    @Value("${stats.service.server.url}")
-    private String statsServerUrl;
     private static final String HIT_URI = "/hit";
     private static final String GET_STATS_URI = "/stats";
+    @Value("${stats.service.server.url}")
+    private String statsServerUrl;
 
     public void addHit(AddHitDto addHitDto) {
         log.info("Statistics client to add hit  with dto: {}", addHitDto);
