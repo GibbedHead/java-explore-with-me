@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.statsclienttest;
+package ru.practicum.explorewithme.ewmservice.statsclienttest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

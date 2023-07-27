@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.user.dto;
+package ru.practicum.explorewithme.ewmservice.user.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

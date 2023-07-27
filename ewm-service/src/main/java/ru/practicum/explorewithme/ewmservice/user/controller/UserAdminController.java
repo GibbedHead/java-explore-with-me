@@ -1,13 +1,13 @@
-package ru.practicum.explorewithme.user.controller;
+package ru.practicum.explorewithme.ewmservice.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.user.dto.RequestAddUserDto;
-import ru.practicum.explorewithme.user.dto.ResponseUserDto;
-import ru.practicum.explorewithme.user.service.UserService;
+import ru.practicum.explorewithme.ewmservice.user.dto.RequestAddUserDto;
+import ru.practicum.explorewithme.ewmservice.user.dto.ResponseUserDto;
+import ru.practicum.explorewithme.ewmservice.user.service.UserService;
 
 import javax.validation.Valid;
 

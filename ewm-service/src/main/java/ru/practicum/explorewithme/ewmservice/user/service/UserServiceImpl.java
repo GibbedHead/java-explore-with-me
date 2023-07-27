@@ -1,13 +1,13 @@
-package ru.practicum.explorewithme.user.service;
+package ru.practicum.explorewithme.ewmservice.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
-import ru.practicum.explorewithme.user.dto.RequestAddUserDto;
-import ru.practicum.explorewithme.user.dto.ResponseUserDto;
-import ru.practicum.explorewithme.user.mapper.UserMapper;
-import ru.practicum.explorewithme.user.repository.UserRepository;
+import ru.practicum.explorewithme.ewmservice.user.dto.RequestAddUserDto;
+import ru.practicum.explorewithme.ewmservice.user.dto.ResponseUserDto;
+import ru.practicum.explorewithme.ewmservice.user.mapper.UserMapper;
+import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
