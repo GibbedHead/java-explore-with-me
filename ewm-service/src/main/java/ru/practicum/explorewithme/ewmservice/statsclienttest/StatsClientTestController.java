@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.explorewithme.statsclient.StatsClient;
-import ru.practicum.explorewithme.statsdto.AddHitDto;
-import ru.practicum.explorewithme.statsdto.ResponseStatsDto;
+import ru.practicum.explorewithme.statsdto.dto.AddHitDto;
+import ru.practicum.explorewithme.statsdto.dto.ResponseStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

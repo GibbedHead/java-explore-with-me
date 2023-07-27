@@ -8,7 +8,7 @@ import ru.practicum.explorewithme.ewmservice.user.model.User;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-07-27T23:42:55+0300",
+    date = "2023-07-28T00:27:25+0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.6 (Amazon.com Inc.)"
 )
 @Component

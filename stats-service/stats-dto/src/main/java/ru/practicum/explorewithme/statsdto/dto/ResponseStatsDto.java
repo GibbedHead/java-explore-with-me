@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.statsdto;
+package ru.practicum.explorewithme.statsdto.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

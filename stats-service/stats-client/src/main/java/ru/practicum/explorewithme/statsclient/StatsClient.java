@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.practicum.explorewithme.statsdto.AddHitDto;
-import ru.practicum.explorewithme.statsdto.ResponseStatsDto;
+import ru.practicum.explorewithme.statsdto.dto.AddHitDto;
+import ru.practicum.explorewithme.statsdto.dto.ResponseStatsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
