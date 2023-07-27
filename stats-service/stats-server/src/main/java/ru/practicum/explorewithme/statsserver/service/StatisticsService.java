@@ -1,8 +1,8 @@
-package ru.practicum.explorewithme.service;
+package ru.practicum.explorewithme.statsserver.service;
 
 
-import ru.practicum.explorewithme.dto.AddHitDto;
-import ru.practicum.explorewithme.dto.ResponseStatsDto;
+import ru.practicum.explorewithme.statsdto.AddHitDto;
+import ru.practicum.explorewithme.statsdto.ResponseStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

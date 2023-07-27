@@ -1,13 +1,13 @@
-package ru.practicum.explorewithme.service;
+package ru.practicum.explorewithme.statsserver.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
-import ru.practicum.explorewithme.dto.AddHitDto;
-import ru.practicum.explorewithme.dto.ResponseStatsDto;
-import ru.practicum.explorewithme.mapper.StatisticsMapper;
-import ru.practicum.explorewithme.repository.StatisticsRepository;
+import ru.practicum.explorewithme.statsdto.AddHitDto;
+import ru.practicum.explorewithme.statsdto.ResponseStatsDto;
+import ru.practicum.explorewithme.statsserver.mapper.StatisticsMapper;
+import ru.practicum.explorewithme.statsserver.repository.StatisticsRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

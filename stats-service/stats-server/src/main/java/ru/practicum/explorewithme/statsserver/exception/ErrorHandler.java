@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.exception;
+package ru.practicum.explorewithme.statsserver.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

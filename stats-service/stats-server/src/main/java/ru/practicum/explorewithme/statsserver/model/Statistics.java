@@ -1,10 +1,9 @@
-package ru.practicum.explorewithme.dto;
+package ru.practicum.explorewithme.statsserver.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -14,14 +13,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AddHitDto {
-    @NotBlank
+@Entity
+@Table(name = "statistics")
+public class Statistics {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+    @NotNull
     String app;
-    @NotBlank
+    @NotNull
     String uri;
-    @NotBlank
+    @NotNull
     String ip;
     @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime timestamp;
 }

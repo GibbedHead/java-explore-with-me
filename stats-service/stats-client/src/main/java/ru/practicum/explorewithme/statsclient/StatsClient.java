@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.client;
+package ru.practicum.explorewithme.statsclient;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.practicum.explorewithme.dto.AddHitDto;
-import ru.practicum.explorewithme.dto.ResponseStatsDto;
+import ru.practicum.explorewithme.statsdto.AddHitDto;
+import ru.practicum.explorewithme.statsdto.ResponseStatsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
