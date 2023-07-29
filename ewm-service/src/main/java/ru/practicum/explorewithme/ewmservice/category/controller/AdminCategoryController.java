@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.ewmservice.category.dto.RequestAddCategoryDto;
+import ru.practicum.explorewithme.ewmservice.category.dto.RequestUpdateCategoryDto;
 import ru.practicum.explorewithme.ewmservice.category.dto.ResponseCategoryDto;
 import ru.practicum.explorewithme.ewmservice.category.service.CategoryService;
 
@@ -24,5 +25,15 @@ public class AdminCategoryController {
     ResponseCategoryDto addCategory(@Valid @RequestBody RequestAddCategoryDto addCategoryDto) {
         log.info("Add category request: {}", addCategoryDto);
         return categoryService.addCategory(addCategoryDto);
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseCategoryDto updateCategory(
+            @PathVariable Long id,
+            @Valid @RequestBody RequestUpdateCategoryDto updateCategoryDto
+    ) {
+        log.info("Update category request: {}", updateCategoryDto);
+        return categoryService.updateCategory(id, updateCategoryDto);
     }
 }
