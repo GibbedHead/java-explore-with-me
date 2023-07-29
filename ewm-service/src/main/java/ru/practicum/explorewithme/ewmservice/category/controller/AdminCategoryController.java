@@ -36,4 +36,11 @@ public class AdminCategoryController {
         log.info("Update category request: {}", updateCategoryDto);
         return categoryService.updateCategory(id, updateCategoryDto);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteCategory(@PathVariable Long id) {
+        log.info("Delete category id#{} request", id);
+        categoryService.deleteById(id);
+    }
 }

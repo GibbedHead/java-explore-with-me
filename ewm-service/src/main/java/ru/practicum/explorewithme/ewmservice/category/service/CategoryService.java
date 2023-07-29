@@ -8,4 +8,6 @@ public interface CategoryService {
     ResponseCategoryDto addCategory(RequestAddCategoryDto addCategoryDto);
 
     ResponseCategoryDto updateCategory(Long id, RequestUpdateCategoryDto updateCategoryDto);
+
+    void deleteById(Long id);
 }

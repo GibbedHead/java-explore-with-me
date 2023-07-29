@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-public class UserAdminController {
+public class AdminUserController {
     private final UserService userService;
 
     @PostMapping
