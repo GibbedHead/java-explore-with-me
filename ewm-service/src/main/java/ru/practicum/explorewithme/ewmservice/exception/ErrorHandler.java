@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.ewmservice.exception;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,25 +21,25 @@ public class ErrorHandler {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ExceptionResponseEntity handleValidationErrors(MethodArgumentNotValidException ex) {
         StringJoiner message = new StringJoiner(". ");
-        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            StringJoiner fieldMessage = new StringJoiner("; ");
-            fieldMessage.add("Field: ".concat(fieldError.getField()));
-            fieldMessage.add("Error: ".concat(
-                            Objects.requireNonNull(
-                                    fieldError.getDefaultMessage(),
-                                    "validation error"
-                            )
-                    )
-            );
-            fieldMessage.add("Value: `".concat(
-                            Objects.requireNonNull(
-                                            fieldError.getRejectedValue(),
-                                            "default value"
-                                    ).toString()
-                                    .concat("`")
-                    )
-            );
-            message.add(fieldMessage.toString());
+        BindingResult bindingResult = ex.getBindingResult();
+        if (bindingResult.hasErrors()) {
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                StringJoiner fieldMessage = new StringJoiner("; ");
+                fieldMessage.add("Field: ".concat(fieldError.getField()));
+                fieldMessage.add("Error: ".concat(
+                                Objects.requireNonNull(
+                                        fieldError.getDefaultMessage(),
+                                        "validation error"
+                                )
+                        )
+                );
+                String rejectedValue;
+                rejectedValue = (fieldError.getRejectedValue() == null)
+                        ? "null"
+                        : fieldError.getRejectedValue().toString();
+                fieldMessage.add("Value: `".concat(rejectedValue).concat("`"));
+                message.add(fieldMessage.toString());
+            }
         }
         return new ExceptionResponseEntity(
                 HttpStatus.BAD_REQUEST.toString(),

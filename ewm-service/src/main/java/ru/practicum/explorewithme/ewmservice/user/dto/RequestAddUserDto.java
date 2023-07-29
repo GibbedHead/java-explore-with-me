@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -13,8 +14,12 @@ import javax.validation.constraints.NotBlank;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestAddUserDto {
     @NotBlank
+    @Size(min = 2, message = "Name length must be between 2 and 250")
+    @Size(max = 250, message = "Name length must be between 2 and 250")
     String name;
     @NotBlank
     @Email
+    @Size(min = 6, message = "Email length must be between 6 and 254")
+    @Size(max = 254, message = "Email length must be between 6 and 254")
     String email;
 }
