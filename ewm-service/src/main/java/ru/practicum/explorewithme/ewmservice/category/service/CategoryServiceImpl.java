@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.ewmservice.category.dto.RequestAddCategoryDto;
 import ru.practicum.explorewithme.ewmservice.category.dto.RequestUpdateCategoryDto;
@@ -14,6 +16,10 @@ import ru.practicum.explorewithme.ewmservice.category.repository.CategoryReposit
 import ru.practicum.explorewithme.ewmservice.category.validator.CategoryValidator;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityHaveDependants;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,5 +69,27 @@ public class CategoryServiceImpl implements CategoryService {
             log.error(message);
             throw new EntityNotFoundException(message);
         }
+    }
+
+    @Override
+    public Collection<ResponseCategoryDto> findAllPaged(Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        List<Category> foundCategories = categoryRepository.findAll(pageable).getContent();
+        log.info("Found {} categories", foundCategories.size());
+        return foundCategories.stream()
+                .map(categoryMapper::categoryToResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ResponseCategoryDto findById(Long id) {
+        Category foundCategory = categoryRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        "Category id#%d not found",
+                        id
+                ))
+        );
+        log.info("Category id#{} found: {}", id, foundCategory);
+        return categoryMapper.categoryToResponseDto(foundCategory);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityHaveDependants;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
 import ru.practicum.explorewithme.ewmservice.exception.model.ExceptionResponseEntity;
@@ -78,6 +79,17 @@ public class ErrorHandler {
         return new ExceptionResponseEntity(
                 HttpStatus.CONFLICT.toString(),
                 "For the requested operation the conditions are not met.",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ExceptionResponseEntity handleEntityHaveDependants(MethodArgumentTypeMismatchException ex) {
+        return new ExceptionResponseEntity(
+                HttpStatus.BAD_REQUEST.toString(),
+                "Wrong parameter.",
                 ex.getMessage(),
                 LocalDateTime.now()
         );
