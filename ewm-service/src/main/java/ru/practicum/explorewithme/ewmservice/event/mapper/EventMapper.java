@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.event.dto.RequestAddEventDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
 
 @Mapper(componentModel = "spring")
@@ -22,4 +23,8 @@ public interface EventMapper {
     @Mapping(target = "confirmedRequests", ignore = true)
     @Mapping(target = "views", ignore = true)
     ResponseFullEventDto eventToResponseFullDto(Event event);
+
+    @Mapping(target = "confirmedRequests", ignore = true)
+    @Mapping(target = "views", ignore = true)
+    ResponseShortEventDto eventToResponseShortDto(Event event);
 }

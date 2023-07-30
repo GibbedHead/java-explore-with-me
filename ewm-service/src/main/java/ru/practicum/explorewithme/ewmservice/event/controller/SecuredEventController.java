@@ -7,9 +7,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.ewmservice.event.dto.RequestAddEventDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
 import ru.practicum.explorewithme.ewmservice.event.service.EventService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import java.util.Collection;
 
 @RestController
 @RequestMapping(path = "/users/{userId}/events")
@@ -27,5 +30,17 @@ public class SecuredEventController {
     ) {
         log.info("Add event request from user id#{}: {}", userId, addEventDto);
         return eventService.addEvent(userId, addEventDto);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    Collection<ResponseShortEventDto> findByUserIdPaged(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") Integer from,
+            @Positive(message = "Size parameter must be positive")
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        log.info("Find paged user id={} events request. From: {}, size: {}", userId, from, size);
+        return eventService.findByUserIdPaged(userId, from, size);
     }
 }
