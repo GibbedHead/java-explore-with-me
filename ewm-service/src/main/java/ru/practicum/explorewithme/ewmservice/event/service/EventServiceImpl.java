@@ -20,7 +20,6 @@ import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessType
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +53,6 @@ public class EventServiceImpl implements EventService {
         event.setInitiator(initiator);
         event.setCategory(category);
         event.setState(EventState.PENDING);
-        event.setCreatedOn(LocalDateTime.now());
         Event savedEvent = eventRepository.save(event);
         log.info("Event saved: {}", savedEvent);
         return eventMapper.eventToResponseFullDto(savedEvent);

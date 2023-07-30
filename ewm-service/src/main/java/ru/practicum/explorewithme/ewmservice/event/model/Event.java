@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.ewmservice.event.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 import ru.practicum.explorewithme.ewmservice.user.model.User;
@@ -33,6 +34,7 @@ public class Event {
     Category category;
     @Column(name = "participant_limit")
     Integer participantLimit;
+    @CreationTimestamp
     @Column(name = "created_on")
     LocalDateTime createdOn;
     @Column(name = "published_on")

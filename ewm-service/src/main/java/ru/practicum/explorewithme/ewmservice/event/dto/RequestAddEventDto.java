@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.explorewithme.ewmservice.event.model.Location;
+import ru.practicum.explorewithme.ewmservice.event.validator.constraint.AtLeastTwoHoursInFuture;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ public class RequestAddEventDto {
     @Positive
     Long category;
     @NotNull
-    @Future
+    @AtLeastTwoHoursInFuture
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime eventDate;
     @NotNull
