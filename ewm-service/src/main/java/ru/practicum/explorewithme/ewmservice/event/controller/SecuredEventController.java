@@ -43,4 +43,14 @@ public class SecuredEventController {
         log.info("Find paged user id={} events request. From: {}, size: {}", userId, from, size);
         return eventService.findByUserIdPaged(userId, from, size);
     }
+
+    @GetMapping("/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseFullEventDto findUserEventByEventId(
+            @PathVariable Long userId,
+            @PathVariable Long eventId
+    ) {
+        log.info("Find user id={} event by id={} request.", userId, eventId);
+        return eventService.findUserEventByEventId(userId, eventId);
+    }
 }

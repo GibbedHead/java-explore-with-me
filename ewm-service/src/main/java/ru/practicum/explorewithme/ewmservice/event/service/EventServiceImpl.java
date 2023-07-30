@@ -16,12 +16,14 @@ import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
+import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessTypeException;
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,5 +68,20 @@ public class EventServiceImpl implements EventService {
         return userEvents.stream()
                 .map(eventMapper::eventToResponseShortDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ResponseFullEventDto findUserEventByEventId(Long userId, Long eventId) {
+        Event foundEvent = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        "Event id#%d not found",
+                        eventId
+                ))
+        );
+        if (!Objects.equals(userId, foundEvent.getInitiator().getId())) {
+            throw new ForbiddenAccessTypeException(String.format("Access to event %d forbidden", eventId));
+        }
+        log.info("Found event: {}", foundEvent);
+        return eventMapper.eventToResponseFullDto(foundEvent);
     }
 }

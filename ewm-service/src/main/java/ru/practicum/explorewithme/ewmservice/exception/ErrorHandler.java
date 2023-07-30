@@ -12,6 +12,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityHaveDependants;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
 import ru.practicum.explorewithme.ewmservice.exception.model.ExceptionResponseEntity;
+import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessTypeException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -90,6 +91,17 @@ public class ErrorHandler {
         return new ExceptionResponseEntity(
                 HttpStatus.BAD_REQUEST.toString(),
                 "Wrong parameter.",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(ForbiddenAccessTypeException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public ExceptionResponseEntity ForbiddenAccessTypeException(ForbiddenAccessTypeException ex) {
+        return new ExceptionResponseEntity(
+                HttpStatus.NOT_FOUND.toString(),
+                "Wrong access.",
                 ex.getMessage(),
                 LocalDateTime.now()
         );

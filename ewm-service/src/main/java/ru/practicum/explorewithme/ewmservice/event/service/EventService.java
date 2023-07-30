@@ -10,4 +10,6 @@ public interface EventService {
     ResponseFullEventDto addEvent(Long userId, RequestAddEventDto addEventDto);
 
     Collection<ResponseShortEventDto> findByUserIdPaged(Long userId, Integer from, Integer size);
+
+    ResponseFullEventDto findUserEventByEventId(Long userId, Long eventId);
 }
