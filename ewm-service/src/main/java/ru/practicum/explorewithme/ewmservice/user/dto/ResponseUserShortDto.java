@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.ewmservice.event.dto;
+package ru.practicum.explorewithme.ewmservice.user.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +7,8 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RequestUpdateEventDto {
-    String title;
+public class ResponseUserShortDto {
+    Long id;
+    String name;
 }

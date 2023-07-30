@@ -1,7 +1,9 @@
-package ru.practicum.explorewithme.ewmservice.event.dto;
+package ru.practicum.explorewithme.ewmservice.event.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import javax.persistence.Embeddable;
 
 @Getter
 @Setter
@@ -9,6 +11,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RequestUpdateEventDto {
-    String title;
+@Embeddable
+public class Location {
+    Float lat;
+    Float lon;
 }
