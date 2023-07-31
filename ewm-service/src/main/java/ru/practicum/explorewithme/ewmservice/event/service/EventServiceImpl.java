@@ -9,13 +9,17 @@ import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
 import ru.practicum.explorewithme.ewmservice.event.dto.RequestAddEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.RequestUpdateEventDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
 import ru.practicum.explorewithme.ewmservice.event.mapper.EventMapper;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
+import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAction;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
+import ru.practicum.explorewithme.ewmservice.event.validator.EventValidator;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
+import ru.practicum.explorewithme.ewmservice.exception.model.EntityStateConflictException;
 import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessTypeException;
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
@@ -81,5 +85,46 @@ public class EventServiceImpl implements EventService {
         }
         log.info("Found event: {}", foundEvent);
         return eventMapper.eventToResponseFullDto(foundEvent);
+    }
+
+    @Override
+    public ResponseFullEventDto updateEvent(Long userId, Long eventId, RequestUpdateEventDto updateEventDto) {
+        Event foundEvent = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        "Event id#%d not found",
+                        eventId
+                ))
+        );
+        if (!Objects.equals(userId, foundEvent.getInitiator().getId())) {
+            throw new ForbiddenAccessTypeException(String.format("Access to event %d forbidden", eventId));
+        }
+        if (!EventValidator.isValidStateForUpdate(foundEvent)) {
+            throw new EntityStateConflictException(
+                    String.format(
+                            "Event state %s don't allow updates",
+                            foundEvent.getState()
+                    )
+            );
+        }
+        eventMapper.updateEventFromRequestUpdateDto(updateEventDto, foundEvent);
+        updateEventState(updateEventDto.getStateAction(), foundEvent);
+        Event updatedEvent = eventRepository.save(foundEvent);
+        log.info("Event updated: {}", updatedEvent);
+        return eventMapper.eventToResponseFullDto(updatedEvent);
+    }
+
+    private void updateEventState(EventModerationStateChangeAction action, Event event) {
+        if (action != null) {
+            switch (action) {
+                case SEND_TO_REVIEW:
+                    event.setState(EventState.PENDING);
+                    break;
+                case CANCEL_REVIEW:
+                    event.setState(EventState.CANCELED);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

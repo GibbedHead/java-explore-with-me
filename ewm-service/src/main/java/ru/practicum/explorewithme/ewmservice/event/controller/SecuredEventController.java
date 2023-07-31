@@ -62,7 +62,7 @@ public class SecuredEventController {
             @PathVariable Long eventId,
             @Valid @RequestBody RequestUpdateEventDto updateEventDto
     ) {
-        log.info("Find user id={} event by id={} request.", userId, eventId);
-        return eventService.findUserEventByEventId(userId, eventId);
+        log.info("Update event id={} event by user id={} request. Event: {}", eventId, userId, updateEventDto);
+        return eventService.updateEvent(userId, eventId, updateEventDto);
     }
 }

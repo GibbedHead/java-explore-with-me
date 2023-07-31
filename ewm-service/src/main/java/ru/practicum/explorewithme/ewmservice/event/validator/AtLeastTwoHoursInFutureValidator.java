@@ -10,6 +10,9 @@ public class AtLeastTwoHoursInFutureValidator implements ConstraintValidator<AtL
     @Override
     public final boolean isValid(final LocalDateTime value,
                                  final ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
+        }
         return value.isAfter(LocalDateTime.now().plusHours(2)) || value.isEqual(LocalDateTime.now().plusHours(2));
     }
 }

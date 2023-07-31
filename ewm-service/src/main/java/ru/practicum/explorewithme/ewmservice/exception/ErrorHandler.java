@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.explorewithme.ewmservice.exception.model.EntityHaveDependants;
-import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
-import ru.practicum.explorewithme.ewmservice.exception.model.ExceptionResponseEntity;
-import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessTypeException;
+import ru.practicum.explorewithme.ewmservice.exception.model.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -98,10 +95,21 @@ public class ErrorHandler {
 
     @ExceptionHandler(ForbiddenAccessTypeException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ExceptionResponseEntity ForbiddenAccessTypeException(ForbiddenAccessTypeException ex) {
+    public ExceptionResponseEntity handleForbiddenAccessTypeException(ForbiddenAccessTypeException ex) {
         return new ExceptionResponseEntity(
                 HttpStatus.NOT_FOUND.toString(),
                 "Wrong access.",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(EntityStateConflictException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ExceptionResponseEntity handleEntityStateConflictException(EntityStateConflictException ex) {
+        return new ExceptionResponseEntity(
+                HttpStatus.CONFLICT.toString(),
+                "Wrong object state.",
                 ex.getMessage(),
                 LocalDateTime.now()
         );
