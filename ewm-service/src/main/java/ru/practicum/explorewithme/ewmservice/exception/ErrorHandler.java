@@ -84,7 +84,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ExceptionResponseEntity handleEntityHaveDependants(MethodArgumentTypeMismatchException ex) {
+    public ExceptionResponseEntity handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         return new ExceptionResponseEntity(
                 HttpStatus.BAD_REQUEST.toString(),
                 "Wrong parameter.",

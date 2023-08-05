@@ -1,9 +1,6 @@
 package ru.practicum.explorewithme.ewmservice.event.service;
 
-import ru.practicum.explorewithme.ewmservice.event.dto.RequestAddEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.RequestUpdateEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.*;
 
 import java.util.Collection;
 
@@ -15,4 +12,6 @@ public interface EventService {
     ResponseFullEventDto findUserEventByEventId(Long userId, Long eventId);
 
     ResponseFullEventDto updateEvent(Long userId, Long eventId, RequestUpdateEventDto updateEventDto);
+
+    ResponseFullEventDto adminUpdateEvent(Long eventId, RequestUpdateEventAdminDto updateEventAdminDto);
 }

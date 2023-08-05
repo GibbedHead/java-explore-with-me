@@ -8,10 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
-import ru.practicum.explorewithme.ewmservice.event.dto.RequestAddEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.RequestUpdateEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.*;
 import ru.practicum.explorewithme.ewmservice.event.mapper.EventMapper;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
@@ -126,5 +123,10 @@ public class EventServiceImpl implements EventService {
                     break;
             }
         }
+    }
+
+    @Override
+    public ResponseFullEventDto adminUpdateEvent(Long eventId, RequestUpdateEventAdminDto updateEventAdminDto) {
+        return null;
     }
 }
