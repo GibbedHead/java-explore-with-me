@@ -1,12 +1,12 @@
 package ru.practicum.explorewithme.ewmservice.event.validator;
 
-import ru.practicum.explorewithme.ewmservice.event.validator.constraint.AtLeastTwoHoursInFuture;
+import ru.practicum.explorewithme.ewmservice.event.validator.constraint.AtLeastOneHourInFuture;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDateTime;
 
-public class AtLeastOneHourInFutureValidator implements ConstraintValidator<AtLeastTwoHoursInFuture, LocalDateTime> {
+public class AtLeastOneHourInFutureValidator implements ConstraintValidator<AtLeastOneHourInFuture, LocalDateTime> {
     @Override
     public final boolean isValid(final LocalDateTime value,
                                  final ConstraintValidatorContext context) {

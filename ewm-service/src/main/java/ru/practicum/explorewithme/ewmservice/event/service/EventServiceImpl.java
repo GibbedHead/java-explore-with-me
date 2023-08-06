@@ -13,6 +13,7 @@ import ru.practicum.explorewithme.ewmservice.event.mapper.EventMapper;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
 import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAction;
+import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAdminAction;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 import ru.practicum.explorewithme.ewmservice.event.validator.EventValidator;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
@@ -127,6 +128,45 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public ResponseFullEventDto adminUpdateEvent(Long eventId, RequestUpdateEventAdminDto updateEventAdminDto) {
-        return null;
+        Event foundEvent = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        "Event id#%d not found",
+                        eventId
+                ))
+        );
+        if (
+                updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.PUBLISH_EVENT
+                &&
+                        foundEvent.getState() != EventState.PENDING
+        ) {
+            throw new EntityStateConflictException("Only pending events can be published.");
+        }
+        if (
+                updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.REJECT_EVENT
+                        &&
+                        foundEvent.getState() == EventState.PUBLISHED
+        ) {
+            throw new EntityStateConflictException("Can't reject published event.");
+        }
+        eventMapper.updateEventFromAdminRequestUpdateDto(updateEventAdminDto, foundEvent);
+        adminUpdateEventState(updateEventAdminDto.getStateAction(), foundEvent);
+        Event updatedEvent = eventRepository.save(foundEvent);
+        log.info("Event updated: {}", updatedEvent);
+        return eventMapper.eventToResponseFullDto(updatedEvent);
+    }
+
+    private void adminUpdateEventState(EventModerationStateChangeAdminAction action, Event event) {
+        if (action != null) {
+            switch (action) {
+                case PUBLISH_EVENT:
+                    event.setState(EventState.PUBLISHED);
+                    break;
+                case REJECT_EVENT:
+                    event.setState(EventState.CANCELED);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

@@ -9,6 +9,8 @@ import ru.practicum.explorewithme.ewmservice.event.dto.RequestUpdateEventAdminDt
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
 import ru.practicum.explorewithme.ewmservice.event.service.EventService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(path = "/admin/events")
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class AdminEventController {
     @ResponseStatus(HttpStatus.OK)
     ResponseFullEventDto update(
             @PathVariable Long eventId,
-            @RequestBody RequestUpdateEventAdminDto updateEventAdminDto
+            @Valid @RequestBody RequestUpdateEventAdminDto updateEventAdminDto
     ) {
         return eventService.adminUpdateEvent(eventId, updateEventAdminDto);
     }
