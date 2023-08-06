@@ -9,7 +9,9 @@ import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 import ru.practicum.explorewithme.ewmservice.exception.model.*;
+import ru.practicum.explorewithme.ewmservice.request.dto.RequestUpdateRequestStatusDto;
 import ru.practicum.explorewithme.ewmservice.request.dto.ResponseRequestDto;
+import ru.practicum.explorewithme.ewmservice.request.dto.ResponseUpdateRequestStatusDto;
 import ru.practicum.explorewithme.ewmservice.request.mapper.RequestMapper;
 import ru.practicum.explorewithme.ewmservice.request.model.Request;
 import ru.practicum.explorewithme.ewmservice.request.repository.RequestRepository;
@@ -17,6 +19,7 @@ import ru.practicum.explorewithme.ewmservice.request.status.RequestStatus;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,8 +54,8 @@ public class RequestServiceImpl implements RequestService {
         Long confirmedRequests = requestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED);
         if (
                 foundEvent.getParticipantLimit() != 0
-            &&
-                confirmedRequests >= foundEvent.getParticipantLimit()
+                        &&
+                        confirmedRequests >= foundEvent.getParticipantLimit()
         ) {
             throw new EventParticipantLimitExceededException("Event participant limit exceeded.");
         }
@@ -63,7 +66,7 @@ public class RequestServiceImpl implements RequestService {
         if (foundEvent.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
         } else {
-            if (foundEvent.getRequestModeration()) {
+            if (Boolean.TRUE.equals(foundEvent.getRequestModeration())) {
                 request.setStatus(RequestStatus.PENDING);
             } else {
                 request.setStatus(RequestStatus.CONFIRMED);
@@ -97,5 +100,55 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.findByEvent(eventId).stream()
                 .map(requestMapper::requestToResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ResponseUpdateRequestStatusDto updateRequestsStatus(
+            Long eventId,
+            RequestUpdateRequestStatusDto updateRequestStatusDto
+    ) {
+        if (
+                updateRequestStatusDto.getRequestIds() == null
+                        ||
+                        updateRequestStatusDto.getRequestIds().isEmpty()
+        ) {
+            return new ResponseUpdateRequestStatusDto();
+        }
+        Event foundEvent = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        "Event id#%d not found",
+                        eventId
+                ))
+        );
+        if (
+                foundEvent.getParticipantLimit() == 0
+                        ||
+                        Boolean.FALSE.equals(foundEvent.getRequestModeration())
+        ) {
+            return new ResponseUpdateRequestStatusDto();
+        }
+        Long confirmedRequestsCount = requestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED);
+        if (confirmedRequestsCount >= foundEvent.getParticipantLimit()) {
+            throw new EventParticipantLimitExceededException("Event participant limit exceeded.");
+        }
+        List<Request> requests = requestRepository.findByIdIn(updateRequestStatusDto.getRequestIds());
+        for (Request request : requests) {
+            if (request.getStatus().equals(RequestStatus.PENDING)) {
+                if (confirmedRequestsCount < foundEvent.getParticipantLimit()) {
+                    confirmedRequestsCount++;
+                    request.setStatus(updateRequestStatusDto.getStatus());
+                } else {
+                    request.setStatus(RequestStatus.REJECTED);
+                }
+            }
+        }
+        requests.forEach(requestRepository::save);
+        List<Request> confirmedRequests = requests.stream()
+                .filter(r -> r.getStatus().equals(RequestStatus.CONFIRMED))
+                .collect(Collectors.toList());
+        List<Request> rejectedRequests = requests.stream()
+                .filter(r -> r.getStatus().equals(RequestStatus.REJECTED))
+                .collect(Collectors.toList());
+        return new ResponseUpdateRequestStatusDto(confirmedRequests, rejectedRequests);
     }
 }
