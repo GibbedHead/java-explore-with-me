@@ -76,6 +76,19 @@ public class RequestServiceImpl implements RequestService {
         } catch (ConstraintViolationException e) {
             throw new DBConstraintViolationException("Non unique participation request");
         }
+    }
 
+    @Override
+    public ResponseRequestDto cancelRequest(Long requestId) {
+        Request foundRequest = requestRepository.findById(requestId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        "Request id#%d not found",
+                        requestId
+                ))
+        );
+        foundRequest.setStatus(RequestStatus.CANCELED);
+        Request savedRequest = requestRepository.save(foundRequest);
+        log.info("Request canceled: {}", savedRequest);
+        return requestMapper.requestToResponseDto(savedRequest);
     }
 }

@@ -24,7 +24,7 @@ public class SecuredRequestController {
             @PathVariable Long userId
     ) {
         log.info("Find requests by user id={} request.", userId);
-        return null;
+        return requestService.findByUserId(userId);
     }
 
     @PostMapping
@@ -35,5 +35,14 @@ public class SecuredRequestController {
     ) {
         log.info("Add requests participation by user id={} for even id = {} request.", userId, eventId);
         return requestService.add(userId, eventId);
+    }
+
+    @PatchMapping("/{requestId}/cancel")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseRequestDto cancelRequest(
+            @PathVariable Long requestId
+    ) {
+        log.info("Cancel request id={} .", requestId);
+        return requestService.cancelRequest(requestId);
     }
 }

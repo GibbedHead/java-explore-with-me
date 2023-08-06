@@ -8,4 +8,6 @@ public interface RequestService {
     Collection<ResponseRequestDto> findByUserId(Long userId);
 
     ResponseRequestDto add(Long userId, Long eventId);
+
+    ResponseRequestDto cancelRequest(Long requestId);
 }
