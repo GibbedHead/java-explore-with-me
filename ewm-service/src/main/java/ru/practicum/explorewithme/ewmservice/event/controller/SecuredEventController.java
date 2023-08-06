@@ -10,6 +10,8 @@ import ru.practicum.explorewithme.ewmservice.event.dto.RequestUpdateEventDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
 import ru.practicum.explorewithme.ewmservice.event.service.EventService;
+import ru.practicum.explorewithme.ewmservice.request.dto.ResponseRequestDto;
+import ru.practicum.explorewithme.ewmservice.request.service.RequestService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -22,6 +24,7 @@ import java.util.Collection;
 @Validated
 public class SecuredEventController {
     private final EventService eventService;
+    private final RequestService requestService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -64,5 +67,14 @@ public class SecuredEventController {
     ) {
         log.info("Update event id={} event by user id={} request. Event: {}", eventId, userId, updateEventDto);
         return eventService.updateEvent(userId, eventId, updateEventDto);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    Collection<ResponseRequestDto> findRequestsByEventId(
+            @PathVariable Long eventId
+    ) {
+        log.info("Find event participation requests by event id={} request.", eventId);
+        return requestService.findByEventId(eventId);
     }
 }

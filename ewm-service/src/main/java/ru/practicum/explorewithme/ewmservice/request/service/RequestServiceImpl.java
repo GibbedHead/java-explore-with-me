@@ -91,4 +91,11 @@ public class RequestServiceImpl implements RequestService {
         log.info("Request canceled: {}", savedRequest);
         return requestMapper.requestToResponseDto(savedRequest);
     }
+
+    @Override
+    public Collection<ResponseRequestDto> findByEventId(Long eventId) {
+        return requestRepository.findByEvent(eventId).stream()
+                .map(requestMapper::requestToResponseDto)
+                .collect(Collectors.toList());
+    }
 }
