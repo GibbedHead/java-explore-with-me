@@ -136,7 +136,7 @@ public class EventServiceImpl implements EventService {
         );
         if (
                 updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.PUBLISH_EVENT
-                &&
+                        &&
                         foundEvent.getState() != EventState.PENDING
         ) {
             throw new EntityStateConflictException("Only pending events can be published.");

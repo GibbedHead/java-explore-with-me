@@ -6,4 +6,6 @@ import java.util.Collection;
 
 public interface RequestService {
     Collection<ResponseRequestDto> findByUserId(Long userId);
+
+    ResponseRequestDto add(Long userId, Long eventId);
 }

@@ -114,4 +114,43 @@ public class ErrorHandler {
                 LocalDateTime.now()
         );
     }
+
+    @ExceptionHandler(OwnEventParticipationRequestException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ExceptionResponseEntity handleOwnEventParticipationRequestException(
+            OwnEventParticipationRequestException ex
+    ) {
+        return new ExceptionResponseEntity(
+                HttpStatus.CONFLICT.toString(),
+                "Wrong operation type.",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(EventParticipantLimitExceededException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ExceptionResponseEntity handleEventParticipantLimitExceededException(
+            EventParticipantLimitExceededException ex
+    ) {
+        return new ExceptionResponseEntity(
+                HttpStatus.CONFLICT.toString(),
+                "Wrong event participation action.",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(DBConstraintViolationException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ExceptionResponseEntity handleDBConstraintViolationException(
+            DBConstraintViolationException ex
+    ) {
+        return new ExceptionResponseEntity(
+                HttpStatus.CONFLICT.toString(),
+                "Entity constraint violation.",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
 }

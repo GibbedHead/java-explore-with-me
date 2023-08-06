@@ -26,4 +26,14 @@ public class SecuredRequestController {
         log.info("Find requests by user id={} request.", userId);
         return null;
     }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    ResponseRequestDto add(
+            @PathVariable Long userId,
+            @RequestParam Long eventId
+    ) {
+        log.info("Add requests participation by user id={} for even id = {} request.", userId, eventId);
+        return requestService.add(userId, eventId);
+    }
 }
