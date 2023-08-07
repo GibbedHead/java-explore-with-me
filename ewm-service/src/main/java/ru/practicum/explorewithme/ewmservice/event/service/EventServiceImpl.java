@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
@@ -22,15 +23,19 @@ import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessType
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static ru.practicum.explorewithme.ewmservice.event.repository.EventRepository.Specifications.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class EventServiceImpl implements EventService {
+    public static final String EVENT_NOT_FOUND_MESSAGE = "Event id#%d not found";
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -74,7 +79,7 @@ public class EventServiceImpl implements EventService {
     public ResponseFullEventDto findUserEventByEventId(Long userId, Long eventId) {
         Event foundEvent = eventRepository.findById(eventId).orElseThrow(
                 () -> new EntityNotFoundException(String.format(
-                        "Event id#%d not found",
+                        EVENT_NOT_FOUND_MESSAGE,
                         eventId
                 ))
         );
@@ -89,7 +94,7 @@ public class EventServiceImpl implements EventService {
     public ResponseFullEventDto updateEvent(Long userId, Long eventId, RequestUpdateEventDto updateEventDto) {
         Event foundEvent = eventRepository.findById(eventId).orElseThrow(
                 () -> new EntityNotFoundException(String.format(
-                        "Event id#%d not found",
+                        EVENT_NOT_FOUND_MESSAGE,
                         eventId
                 ))
         );
@@ -130,7 +135,7 @@ public class EventServiceImpl implements EventService {
     public ResponseFullEventDto adminUpdateEvent(Long eventId, RequestUpdateEventAdminDto updateEventAdminDto) {
         Event foundEvent = eventRepository.findById(eventId).orElseThrow(
                 () -> new EntityNotFoundException(String.format(
-                        "Event id#%d not found",
+                        EVENT_NOT_FOUND_MESSAGE,
                         eventId
                 ))
         );
@@ -168,5 +173,26 @@ public class EventServiceImpl implements EventService {
                     break;
             }
         }
+    }
+
+    @Override
+    public Collection<ResponseFullEventDto> findEventsByCriteria(List<Long> users,
+                                                                 List<EventState> states,
+                                                                 List<Long> categories,
+                                                                 LocalDateTime rangeStart,
+                                                                 LocalDateTime rangeEnd,
+                                                                 Integer from, Integer size) {
+        Sort sort = Sort.by("id").descending();
+        Pageable pageable = PageRequest.of(from / size, size, sort);
+        return eventRepository.findAll(
+                        byUserIn(users)
+                                .and(byStateIn(states))
+                                .and(byCategoryIn(categories))
+                                .and(byRangeStart(rangeStart))
+                                .and(byRangeEnd(rangeEnd)),
+                        pageable
+                ).stream()
+                .map(eventMapper::eventToResponseFullDto)
+                .collect(Collectors.toList());
     }
 }
