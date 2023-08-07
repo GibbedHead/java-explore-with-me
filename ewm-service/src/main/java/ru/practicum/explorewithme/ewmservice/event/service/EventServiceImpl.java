@@ -20,8 +20,11 @@ import ru.practicum.explorewithme.ewmservice.event.validator.EventValidator;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityStateConflictException;
 import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessTypeException;
+import ru.practicum.explorewithme.ewmservice.request.service.RequestService;
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
+import ru.practicum.explorewithme.statsclient.StatsClient;
+import ru.practicum.explorewithme.statsdto.dto.ResponseStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -39,6 +42,8 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final RequestService requestService;
+    private final StatsClient statsClient;
     private final EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
 
     @Override
@@ -181,10 +186,11 @@ public class EventServiceImpl implements EventService {
                                                                  List<Long> categories,
                                                                  LocalDateTime rangeStart,
                                                                  LocalDateTime rangeEnd,
-                                                                 Integer from, Integer size) {
+                                                                 Integer from,
+                                                                 Integer size) {
         Sort sort = Sort.by("id").descending();
         Pageable pageable = PageRequest.of(from / size, size, sort);
-        return eventRepository.findAll(
+        List<ResponseFullEventDto> fullEventDtos = eventRepository.findAll(
                         byUserIn(users)
                                 .and(byStateIn(states))
                                 .and(byCategoryIn(categories))
@@ -194,5 +200,26 @@ public class EventServiceImpl implements EventService {
                 ).stream()
                 .map(eventMapper::eventToResponseFullDto)
                 .collect(Collectors.toList());
+        fullEventDtos.forEach(e -> e.setConfirmedRequests(requestService.getConfirmedRequestCount(e.getId())));
+        fullEventDtos.forEach(e -> {
+                    Collection<ResponseStatsDto> statsClientStats = statsClient.getStats(
+                            null,
+                            null,
+                            List.of(String.format("/events/%d", e.getId())),
+                            false
+                    );
+                    Long views;
+                    if (!statsClientStats.isEmpty()) {
+                        views = statsClientStats.iterator().next().getHits();
+                    } else {
+                        views = 0L;
+                    }
+                    e.setViews(
+                            views
+                    );
+                }
+        );
+        log.info("Found {} events", fullEventDtos.size());
+        return fullEventDtos;
     }
 }

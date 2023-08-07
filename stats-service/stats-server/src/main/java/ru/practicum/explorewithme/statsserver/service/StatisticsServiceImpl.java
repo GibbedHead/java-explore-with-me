@@ -29,6 +29,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Collection<ResponseStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        return statisticsRepository.getStatsBetweenDatesAndUris(start, end, uris, unique);
+        Collection<ResponseStatsDto> responseStatsDtos = statisticsRepository.getStatsBetweenDatesAndUris(
+                start, end, uris, unique
+        );
+        log.info("Found {} stat rows", responseStatsDtos.size());
+        return responseStatsDtos;
     }
 }

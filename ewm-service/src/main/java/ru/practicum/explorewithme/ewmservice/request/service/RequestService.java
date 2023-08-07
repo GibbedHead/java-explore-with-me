@@ -19,4 +19,6 @@ public interface RequestService {
             Long eventId,
             RequestUpdateRequestStatusDto updateRequestStatusDto
     );
+
+    Long getConfirmedRequestCount(Long eventId);
 }

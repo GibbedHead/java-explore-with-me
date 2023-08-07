@@ -51,7 +51,7 @@ public class RequestServiceImpl implements RequestService {
         if (!foundEvent.getState().equals(EventState.PUBLISHED)) {
             throw new EntityStateConflictException("Only published events allowed to get participation requests.");
         }
-        Long confirmedRequests = requestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED);
+        Long confirmedRequests = getConfirmedRequestCount(eventId);
         if (
                 foundEvent.getParticipantLimit() != 0
                         &&
@@ -127,7 +127,7 @@ public class RequestServiceImpl implements RequestService {
         ) {
             return new ResponseUpdateRequestStatusDto();
         }
-        Long confirmedRequestsCount = requestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED);
+        Long confirmedRequestsCount = getConfirmedRequestCount(eventId);
         if (confirmedRequestsCount >= foundEvent.getParticipantLimit()) {
             throw new EventParticipantLimitExceededException("Event participant limit exceeded.");
         }
@@ -150,5 +150,10 @@ public class RequestServiceImpl implements RequestService {
                 .filter(r -> r.getStatus().equals(RequestStatus.REJECTED))
                 .collect(Collectors.toList());
         return new ResponseUpdateRequestStatusDto(confirmedRequests, rejectedRequests);
+    }
+
+    @Override
+    public Long getConfirmedRequestCount(Long eventId) {
+        return requestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED);
     }
 }

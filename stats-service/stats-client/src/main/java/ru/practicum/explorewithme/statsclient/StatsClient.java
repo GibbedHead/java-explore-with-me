@@ -55,9 +55,13 @@ public class StatsClient {
         WebClient webClient = WebClient.create(statsServerUrl);
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromPath(GET_STATS_URI)
-                .queryParam("start", start.format(dateTimeFormatter))
-                .queryParam("end", end.format(dateTimeFormatter));
+                .fromPath(GET_STATS_URI);
+        if (start != null) {
+            uriBuilder.queryParam("start", start.format(dateTimeFormatter));
+        }
+        if (end != null) {
+            uriBuilder.queryParam("end", end.format(dateTimeFormatter));
+        }
         if (uris != null && !uris.isEmpty()) {
             uriBuilder.queryParam("uris", uris);
         }

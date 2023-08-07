@@ -22,7 +22,7 @@ public class ResponseFullEventDto {
     String title;
     Category category;
     Integer participantLimit;
-    Integer confirmedRequests;
+    Long confirmedRequests;
     LocalDateTime createdOn;
     LocalDateTime publishedOn;
     LocalDateTime eventDate;
