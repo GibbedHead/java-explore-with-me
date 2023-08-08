@@ -1,6 +1,7 @@
 package ru.practicum.explorewithme.ewmservice.event.service;
 
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
+import ru.practicum.explorewithme.ewmservice.event.sort.EventSortField;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,5 +30,16 @@ public interface EventService {
 
     ResponseFullEventDto findPublicByEventId(Long id, HttpServletRequest request);
 
-    ResponseFullEventDto findPublicByCriteria(HttpServletRequest request);
+    ResponseFullEventDto findPublicByCriteria(
+            String text,
+            List<Long> categories,
+            Boolean paid,
+            LocalDateTime rangeStart,
+            LocalDateTime rangeEnd,
+            Boolean onlyAvailable,
+            EventSortField sort,
+            Integer from,
+            Integer size,
+            HttpServletRequest request
+    );
 }

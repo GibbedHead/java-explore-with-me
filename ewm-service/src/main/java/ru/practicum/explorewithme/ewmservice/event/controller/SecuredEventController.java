@@ -17,6 +17,7 @@ import ru.practicum.explorewithme.ewmservice.request.service.RequestService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
@@ -42,6 +43,7 @@ public class SecuredEventController {
     @ResponseStatus(HttpStatus.OK)
     Collection<ResponseShortEventDto> findByUserIdPaged(
             @PathVariable Long userId,
+            @PositiveOrZero(message = "From parameter must be positive or zero")
             @RequestParam(defaultValue = "0") Integer from,
             @Positive(message = "Size parameter must be positive")
             @RequestParam(defaultValue = "10") Integer size

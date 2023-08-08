@@ -9,6 +9,7 @@ import ru.practicum.explorewithme.ewmservice.category.dto.ResponseCategoryDto;
 import ru.practicum.explorewithme.ewmservice.category.service.CategoryService;
 
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
@@ -22,6 +23,7 @@ public class PublicCategoryController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Collection<ResponseCategoryDto> findAllPaged(
+            @PositiveOrZero(message = "From parameter must be positive or zero")
             @RequestParam(defaultValue = "0") Integer from,
             @Positive(message = "Size parameter must be positive")
             @RequestParam(defaultValue = "10") Integer size

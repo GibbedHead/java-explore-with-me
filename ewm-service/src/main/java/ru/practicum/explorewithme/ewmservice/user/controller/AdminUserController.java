@@ -36,7 +36,7 @@ public class AdminUserController {
     @ResponseStatus(HttpStatus.OK)
     Collection<ResponseUserDto> findUsers(
             @RequestParam(required = false) List<Long> ids,
-            @PositiveOrZero(message = "From parameter must be greater or equal 0")
+            @PositiveOrZero(message = "From parameter must be positive or zero")
             @RequestParam(defaultValue = "0") Integer from,
             @Positive(message = "Size parameter must be positive")
             @RequestParam(defaultValue = "10") Integer size

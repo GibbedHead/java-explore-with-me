@@ -13,6 +13,7 @@ import ru.practicum.explorewithme.ewmservice.event.dto.*;
 import ru.practicum.explorewithme.ewmservice.event.mapper.EventMapper;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
+import ru.practicum.explorewithme.ewmservice.event.sort.EventSortField;
 import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAction;
 import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAdminAction;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
@@ -242,7 +243,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseFullEventDto findPublicByCriteria(HttpServletRequest request) {
+    public ResponseFullEventDto findPublicByCriteria(
+            String text,
+            List<Long> categories,
+            Boolean paid,
+            LocalDateTime rangeStart,
+            LocalDateTime rangeEnd,
+            Boolean onlyAvailable,
+            EventSortField sort,
+            Integer from,
+            Integer size,
+            HttpServletRequest request
+    ) {
         AddHitDto hit = new AddHitDto(
                 "ewm-main-service",
                 request.getRequestURI(),
