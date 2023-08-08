@@ -20,17 +20,17 @@ public interface EventService {
 
     ResponseFullEventDto adminUpdateEvent(Long eventId, RequestUpdateEventAdminDto updateEventAdminDto);
 
-    Collection<ResponseFullEventDto> findEventsByCriteria(List<Long> users,
-                                                          List<EventState> states,
-                                                          List<Long> categories,
-                                                          LocalDateTime rangeStart,
-                                                          LocalDateTime rangeEnd,
-                                                          Integer from,
-                                                          Integer size);
+    Collection<ResponseFullEventDto> findAdminByCriteria(List<Long> users,
+                                                         List<EventState> states,
+                                                         List<Long> categories,
+                                                         LocalDateTime rangeStart,
+                                                         LocalDateTime rangeEnd,
+                                                         Integer from,
+                                                         Integer size);
 
     ResponseFullEventDto findPublicByEventId(Long id, HttpServletRequest request);
 
-    ResponseFullEventDto findPublicByCriteria(
+    Collection<ResponseFullEventDto> findPublicByCriteria(
             String text,
             List<Long> categories,
             Boolean paid,

@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
@@ -190,14 +191,15 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Collection<ResponseFullEventDto> findEventsByCriteria(List<Long> users,
-                                                                 List<EventState> states,
-                                                                 List<Long> categories,
-                                                                 LocalDateTime rangeStart,
-                                                                 LocalDateTime rangeEnd,
-                                                                 Integer from,
-                                                                 Integer size) {
+    public Collection<ResponseFullEventDto> findAdminByCriteria(List<Long> users,
+                                                                List<EventState> states,
+                                                                List<Long> categories,
+                                                                LocalDateTime rangeStart,
+                                                                LocalDateTime rangeEnd,
+                                                                Integer from,
+                                                                Integer size) {
         Sort sort = Sort.by("id").descending();
         Pageable pageable = PageRequest.of(from / size, size, sort);
         List<ResponseFullEventDto> fullEventDtos = eventRepository.findAll(
@@ -243,7 +245,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseFullEventDto findPublicByCriteria(
+    public Collection<ResponseFullEventDto> findPublicByCriteria(
             String text,
             List<Long> categories,
             Boolean paid,
@@ -255,6 +257,19 @@ public class EventServiceImpl implements EventService {
             Integer size,
             HttpServletRequest request
     ) {
+        Sort sorting = Sort.by("eventDate").descending();
+        Pageable pageable = PageRequest.of(from / size, size, sorting);
+        List<ResponseFullEventDto> fullEventDtos = eventRepository.findAll(
+                        byAnnotationAndDescriptionIgnoreCases(text)
+                                .and(byCategoryIn(categories))
+                                .and(byPaid(paid))
+                                .and(byRangeStart(rangeStart))
+                                .and(byRangeEnd(rangeEnd))
+                                .and(byAvailability(onlyAvailable)),
+                        pageable
+                ).stream()
+                .map(eventMapper::eventToResponseFullDto)
+                .collect(Collectors.toList());
         AddHitDto hit = new AddHitDto(
                 "ewm-main-service",
                 request.getRequestURI(),
@@ -262,7 +277,9 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now()
         );
         statsClient.addHit(hit);
-        return null;
+        fullEventDtos.forEach(this::addToFullEventDtoRequestsAndViews);
+        log.info("Found {} events", fullEventDtos.size());
+        return fullEventDtos;
     }
 
     private void addToFullEventDtoRequestsAndViews(ResponseFullEventDto responseFullEventDto) {

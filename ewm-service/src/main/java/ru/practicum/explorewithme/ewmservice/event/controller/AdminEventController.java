@@ -61,7 +61,7 @@ public class AdminEventController {
                 from,
                 size
         );
-        return eventService.findEventsByCriteria(
+        return eventService.findAdminByCriteria(
                 users,
                 states,
                 categories,

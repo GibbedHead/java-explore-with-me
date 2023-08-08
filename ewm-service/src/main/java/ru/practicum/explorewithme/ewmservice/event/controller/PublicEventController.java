@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class PublicEventController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    ResponseFullEventDto findPublicByCriteria(
+    Collection<ResponseFullEventDto> findPublicByCriteria(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,
@@ -42,7 +43,19 @@ public class PublicEventController {
             @RequestParam(defaultValue = "10") Integer size,
             HttpServletRequest request
     ) {
-        log.info("Show event id={ request");
+        log.info(
+                "Show events request by:\n\ttext={}\n\tcategories={}\n\tpaid={}\n\trangeStart={}\n\t" +
+                        "rangeEnd={}\n\tonlyAvailable={}\n\tsort={}\n\tfrom={}\n\tsize={}",
+                text,
+                categories,
+                paid,
+                rangeStart,
+                rangeEnd,
+                onlyAvailable,
+                sort,
+                from,
+                size
+        );
         return eventService.findPublicByCriteria(
                 text,
                 categories,
