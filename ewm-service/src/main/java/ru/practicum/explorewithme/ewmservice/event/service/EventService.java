@@ -3,6 +3,7 @@ package ru.practicum.explorewithme.ewmservice.event.service;
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -25,4 +26,8 @@ public interface EventService {
                                                           LocalDateTime rangeEnd,
                                                           Integer from,
                                                           Integer size);
+
+    ResponseFullEventDto findPublicByEventId(Long id, HttpServletRequest request);
+
+    ResponseFullEventDto findPublicByCriteria(HttpServletRequest request);
 }

@@ -24,8 +24,10 @@ import ru.practicum.explorewithme.ewmservice.request.service.RequestService;
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
 import ru.practicum.explorewithme.statsclient.StatsClient;
+import ru.practicum.explorewithme.statsdto.dto.AddHitDto;
 import ru.practicum.explorewithme.statsdto.dto.ResponseStatsDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -203,8 +205,8 @@ public class EventServiceImpl implements EventService {
         fullEventDtos.forEach(e -> e.setConfirmedRequests(requestService.getConfirmedRequestCount(e.getId())));
         fullEventDtos.forEach(e -> {
                     Collection<ResponseStatsDto> statsClientStats = statsClient.getStats(
-                            null,
-                            null,
+                            LocalDateTime.now().minusYears(100),
+                            LocalDateTime.now().plusYears(100),
                             List.of(String.format("/events/%d", e.getId())),
                             false
                     );
@@ -221,5 +223,29 @@ public class EventServiceImpl implements EventService {
         );
         log.info("Found {} events", fullEventDtos.size());
         return fullEventDtos;
+    }
+
+    @Override
+    public ResponseFullEventDto findPublicByEventId(Long id, HttpServletRequest request) {
+        AddHitDto hit = new AddHitDto(
+                "ewm-main-service",
+                request.getRequestURI(),
+                request.getRemoteAddr(),
+                LocalDateTime.now()
+        );
+        statsClient.addHit(hit);
+        return null;
+    }
+
+    @Override
+    public ResponseFullEventDto findPublicByCriteria(HttpServletRequest request) {
+        AddHitDto hit = new AddHitDto(
+                "ewm-main-service",
+                request.getRequestURI(),
+                request.getRemoteAddr(),
+                LocalDateTime.now()
+        );
+        statsClient.addHit(hit);
+        return null;
     }
 }

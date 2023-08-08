@@ -15,6 +15,7 @@ public interface EventMapper {
     Event addDtoToEvent(RequestAddEventDto addEventDto);
 
     @Mapping(source = "category", target = "id")
+    @Mapping(target = "name", ignore = true)
     Category mapCategoryIdToCategory(Long category);
 
     @Mapping(target = "confirmedRequests", ignore = true)

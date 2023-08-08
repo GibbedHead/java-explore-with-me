@@ -6,6 +6,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.statsdto.dto.AddHitDto;
 import ru.practicum.explorewithme.statsdto.dto.ResponseStatsDto;
+import ru.practicum.explorewithme.statsserver.exception.model.DateRangeException;
 import ru.practicum.explorewithme.statsserver.mapper.StatisticsMapper;
 import ru.practicum.explorewithme.statsserver.repository.StatisticsRepository;
 
@@ -29,6 +30,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Collection<ResponseStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        if (start != null && end != null && (start.isAfter(end))) {
+                throw new DateRangeException("Start date must be before end date");
+
+        }
         Collection<ResponseStatsDto> responseStatsDtos = statisticsRepository.getStatsBetweenDatesAndUris(
                 start, end, uris, unique
         );
