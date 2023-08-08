@@ -93,8 +93,10 @@ public class EventServiceImpl implements EventService {
         if (!Objects.equals(userId, foundEvent.getInitiator().getId())) {
             throw new ForbiddenAccessTypeException(String.format("Access to event %d forbidden", eventId));
         }
-        log.info("Found event: {}", foundEvent);
-        return eventMapper.eventToResponseFullDto(foundEvent);
+        ResponseFullEventDto fullEventDto = eventMapper.eventToResponseFullDto(foundEvent);
+        addToFullEventDtoRequestsAndViews(fullEventDto);
+        log.info("Event found {}", fullEventDto);
+        return fullEventDto;
     }
 
     @Override
@@ -119,8 +121,10 @@ public class EventServiceImpl implements EventService {
         eventMapper.updateEventFromRequestUpdateDto(updateEventDto, foundEvent);
         updateEventState(updateEventDto.getStateAction(), foundEvent);
         Event updatedEvent = eventRepository.save(foundEvent);
-        log.info("Event updated: {}", updatedEvent);
-        return eventMapper.eventToResponseFullDto(updatedEvent);
+        ResponseFullEventDto fullEventDto = eventMapper.eventToResponseFullDto(updatedEvent);
+        addToFullEventDtoRequestsAndViews(fullEventDto);
+        log.info("Event updated {}", fullEventDto);
+        return fullEventDto;
     }
 
     private void updateEventState(EventModerationStateChangeAction action, Event event) {
@@ -163,8 +167,11 @@ public class EventServiceImpl implements EventService {
         eventMapper.updateEventFromAdminRequestUpdateDto(updateEventAdminDto, foundEvent);
         adminUpdateEventState(updateEventAdminDto.getStateAction(), foundEvent);
         Event updatedEvent = eventRepository.save(foundEvent);
-        log.info("Event updated: {}", updatedEvent);
-        return eventMapper.eventToResponseFullDto(updatedEvent);
+        ResponseFullEventDto fullEventDto = eventMapper.eventToResponseFullDto(updatedEvent);
+        addToFullEventDtoRequestsAndViews(fullEventDto);
+        log.info("Event updated {}", fullEventDto);
+        return fullEventDto;
+
     }
 
     private void adminUpdateEventState(EventModerationStateChangeAdminAction action, Event event) {
@@ -202,31 +209,28 @@ public class EventServiceImpl implements EventService {
                 ).stream()
                 .map(eventMapper::eventToResponseFullDto)
                 .collect(Collectors.toList());
-        fullEventDtos.forEach(e -> e.setConfirmedRequests(requestService.getConfirmedRequestCount(e.getId())));
-        fullEventDtos.forEach(e -> {
-                    Collection<ResponseStatsDto> statsClientStats = statsClient.getStats(
-                            LocalDateTime.now().minusYears(100),
-                            LocalDateTime.now().plusYears(100),
-                            List.of(String.format("/events/%d", e.getId())),
-                            false
-                    );
-                    Long views;
-                    if (!statsClientStats.isEmpty()) {
-                        views = statsClientStats.iterator().next().getHits();
-                    } else {
-                        views = 0L;
-                    }
-                    e.setViews(
-                            views
-                    );
-                }
-        );
+        fullEventDtos.forEach(this::addToFullEventDtoRequestsAndViews);
         log.info("Found {} events", fullEventDtos.size());
         return fullEventDtos;
     }
 
     @Override
-    public ResponseFullEventDto findPublicByEventId(Long id, HttpServletRequest request) {
+    public ResponseFullEventDto findPublicByEventId(Long eventId, HttpServletRequest request) {
+        Event foundEvent = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        EVENT_NOT_FOUND_MESSAGE,
+                        eventId
+                ))
+        );
+        if (!foundEvent.getState().equals(EventState.PUBLISHED)) {
+            throw new ForbiddenAccessTypeException(String.format(
+                    EVENT_NOT_FOUND_MESSAGE,
+                    eventId
+            ));
+        }
+        ResponseFullEventDto fullEventDto = eventMapper.eventToResponseFullDto(foundEvent);
+        addToFullEventDtoRequestsAndViews(fullEventDto);
+        log.info("Event found {}", fullEventDto);
         AddHitDto hit = new AddHitDto(
                 "ewm-main-service",
                 request.getRequestURI(),
@@ -234,7 +238,7 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now()
         );
         statsClient.addHit(hit);
-        return null;
+        return fullEventDto;
     }
 
     @Override
@@ -247,5 +251,24 @@ public class EventServiceImpl implements EventService {
         );
         statsClient.addHit(hit);
         return null;
+    }
+
+    private void addToFullEventDtoRequestsAndViews(ResponseFullEventDto responseFullEventDto) {
+        responseFullEventDto.setConfirmedRequests(requestService.getConfirmedRequestCount(responseFullEventDto.getId()));
+        Collection<ResponseStatsDto> statsClientStats = statsClient.getStats(
+                LocalDateTime.now().minusYears(100),
+                LocalDateTime.now().plusYears(100),
+                List.of(String.format("/events/%d", responseFullEventDto.getId())),
+                true
+        );
+        Long views;
+        if (!statsClientStats.isEmpty()) {
+            views = statsClientStats.iterator().next().getHits();
+        } else {
+            views = 0L;
+        }
+        responseFullEventDto.setViews(
+                views
+        );
     }
 }
