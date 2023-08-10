@@ -31,7 +31,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public Collection<ResponseStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (start != null && end != null && (start.isAfter(end))) {
-                throw new DateRangeException("Start date must be before end date");
+            throw new DateRangeException("Start date must be before end date");
 
         }
         Collection<ResponseStatsDto> responseStatsDtos = statisticsRepository.getStatsBetweenDatesAndUris(

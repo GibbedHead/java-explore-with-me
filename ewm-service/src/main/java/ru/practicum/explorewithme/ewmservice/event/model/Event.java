@@ -4,12 +4,14 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
+import ru.practicum.explorewithme.ewmservice.compilation.model.Compilation;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -51,4 +53,11 @@ public class Event {
     Boolean requestModeration;
     @Enumerated(EnumType.STRING)
     EventState state;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "events_compilations",
+            joinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "compilation_id", referencedColumnName = "id")
+    )
+    Set<Compilation> compilations;
 }

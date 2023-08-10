@@ -14,7 +14,6 @@ import javax.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestAddCategoryDto {
     @NotBlank
-    @Size(min = 1, message = "Name length must be between 1 and 50")
-    @Size(max = 50, message = "Name length must be between 1 and 50")
+    @Size(min = 1, max = 50, message = "Name length must be between 1 and 50")
     String name;
 }

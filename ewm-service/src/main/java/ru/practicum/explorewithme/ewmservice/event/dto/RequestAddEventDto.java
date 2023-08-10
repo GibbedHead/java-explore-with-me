@@ -20,16 +20,13 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestAddEventDto {
     @NotBlank
-    @Size(min = 20, message = "Annotation length must be between 20 and 2000")
-    @Size(max = 2000, message = "Annotation length must be between 20 and 2000")
+    @Size(min = 20, max = 2000, message = "Annotation length must be between 20 and 2000")
     String annotation;
     @NotBlank
-    @Size(min = 3, message = "Title length must be between 3 and 120")
-    @Size(max = 120, message = "Title length must be between 3 and 120")
+    @Size(min = 3, max = 120, message = "Title length must be between 3 and 120")
     String title;
     @NotBlank
-    @Size(min = 20, message = "Description length must be between 20 and 7000")
-    @Size(max = 7000, message = "Description length must be between 20 and 7000")
+    @Size(min = 20, max = 7000, message = "Description length must be between 20 and 7000")
     String description;
     @NotNull
     @Positive
