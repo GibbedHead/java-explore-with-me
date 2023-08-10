@@ -9,4 +9,6 @@ public interface CompilationService {
     ResponseCompilationDto add(RequestAddCompilationDto addCompilationDto);
 
     Collection<ResponseCompilationDto> findAllPaged(Boolean pinned, Integer from, Integer size);
+
+    ResponseCompilationDto findById(Long compId);
 }

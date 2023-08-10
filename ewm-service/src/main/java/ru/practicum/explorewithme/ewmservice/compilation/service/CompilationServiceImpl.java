@@ -14,6 +14,7 @@ import ru.practicum.explorewithme.ewmservice.compilation.repository.CompilationR
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.service.EventService;
+import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
 
 import java.util.Collection;
 import java.util.List;
@@ -51,13 +52,27 @@ public class CompilationServiceImpl implements CompilationService {
                 .map(compilationMapper::compilationToResponseDto)
                 .collect(Collectors.toList());
         responseCompilationDtos
-                .forEach(compilationDto -> compilationDto.setEvents(
-                        eventService.findShortDtoByIds(
-                                compilationDto.getEvents().stream()
-                                        .map(ResponseShortEventDto::getId)
-                                        .collect(Collectors.toList())
-                        )
-                ));
+                .forEach(
+                        compilationDto -> compilationDto.getEvents()
+                                .forEach(
+                                        eventService::addToShortEventDtoRequestsAndViews
+                                )
+                );
         return responseCompilationDtos;
+    }
+
+    @Override
+    public ResponseCompilationDto findById(Long compId) {
+        Compilation foundCompilation = compilationRepository.findById(compId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        "Compilation id#%d not found",
+                        compId
+                ))
+        );
+        ResponseCompilationDto responseCompilationDto = compilationMapper.compilationToResponseDto(
+                foundCompilation
+        );
+        responseCompilationDto.getEvents().forEach(eventService::addToShortEventDtoRequestsAndViews);
+        return responseCompilationDto;
     }
 }

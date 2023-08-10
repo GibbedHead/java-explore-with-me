@@ -285,7 +285,8 @@ public class EventServiceImpl implements EventService {
         return fullEventDtos;
     }
 
-    private void addToFullEventDtoRequestsAndViews(ResponseFullEventDto responseFullEventDto) {
+    @Override
+    public void addToFullEventDtoRequestsAndViews(ResponseFullEventDto responseFullEventDto) {
         responseFullEventDto.setConfirmedRequests(requestService.getConfirmedRequestCount(responseFullEventDto.getId()));
         Collection<ResponseStatsDto> statsClientStats = statsClient.getStats(
                 LocalDateTime.now().minusYears(100),
@@ -304,7 +305,8 @@ public class EventServiceImpl implements EventService {
         );
     }
 
-    private void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto) {
+    @Override
+    public void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto) {
         responseShortEventDto.setConfirmedRequests(requestService.getConfirmedRequestCount(responseShortEventDto.getId()));
         Collection<ResponseStatsDto> statsClientStats = statsClient.getStats(
                 LocalDateTime.now().minusYears(100),

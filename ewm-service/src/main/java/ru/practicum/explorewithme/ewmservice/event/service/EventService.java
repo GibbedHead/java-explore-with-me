@@ -44,4 +44,8 @@ public interface EventService {
     );
 
     List<ResponseShortEventDto> findShortDtoByIds(List<Long> ids);
+
+    void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto);
+
+    void addToFullEventDtoRequestsAndViews(ResponseFullEventDto responseFullEventDto);
 }

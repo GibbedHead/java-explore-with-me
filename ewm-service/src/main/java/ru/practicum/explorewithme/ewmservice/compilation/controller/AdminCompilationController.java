@@ -10,6 +10,7 @@ import ru.practicum.explorewithme.ewmservice.compilation.dto.ResponseCompilation
 import ru.practicum.explorewithme.ewmservice.compilation.service.CompilationService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
 @RestController
 @RequestMapping(path = "/admin/compilations")
@@ -27,4 +28,13 @@ public class AdminCompilationController {
         return compilationService.add(addCompilationDto);
     }
 
+    @PatchMapping("/{compId}")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseCompilationDto update(
+            @Positive
+            @PathVariable Long compId,
+            @Valid @RequestBody RequestAddCompilationDto addCompilationDto
+    ) {
+        return null;
+    }
 }

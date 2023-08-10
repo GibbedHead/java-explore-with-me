@@ -32,4 +32,12 @@ public class PublicCompilationController {
         return compilationService.findAllPaged(pinned, from, size);
     }
 
+    @GetMapping("/{compId}")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseCompilationDto findById(
+            @Positive
+            @PathVariable Long compId
+    ) {
+        return compilationService.findById(compId);
+    }
 }
