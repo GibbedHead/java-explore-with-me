@@ -26,7 +26,17 @@ public interface EventRepository extends JpaRepository<Event, Long>,
         static Specification<Event> byUserIn(List<Long> users) {
             return (root, query, builder) -> {
                 if (users != null && !users.isEmpty()) {
-                    return root.get(Event_.id).in(users);
+                    return root.get(Event_.initiator).in(users);
+                } else {
+                    return builder.and();
+                }
+            };
+        }
+
+        static Specification<Event> byIdsIn(List<Long> ids) {
+            return (root, query, builder) -> {
+                if (ids != null && !ids.isEmpty()) {
+                    return root.get(Event_.id).in(ids);
                 } else {
                     return builder.and();
                 }

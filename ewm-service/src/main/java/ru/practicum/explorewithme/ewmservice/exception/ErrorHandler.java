@@ -153,4 +153,15 @@ public class ErrorHandler {
                 LocalDateTime.now()
         );
     }
+
+    @ExceptionHandler(WrongParameterIdsListException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ExceptionResponseEntity handleZeroCategoriesException(WrongParameterIdsListException ex) {
+        return new ExceptionResponseEntity(
+                HttpStatus.BAD_REQUEST.toString(),
+                "Wrong parameter.",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
 }

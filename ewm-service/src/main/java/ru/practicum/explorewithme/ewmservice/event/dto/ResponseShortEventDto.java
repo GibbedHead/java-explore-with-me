@@ -18,7 +18,7 @@ public class ResponseShortEventDto {
     String annotation;
     String title;
     Category category;
-    Integer confirmedRequests;
+    Long confirmedRequests;
     LocalDateTime eventDate;
     ResponseUserShortDto initiator;
     Boolean paid;

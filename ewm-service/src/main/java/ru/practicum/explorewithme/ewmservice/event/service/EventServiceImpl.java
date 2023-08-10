@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
@@ -22,6 +21,7 @@ import ru.practicum.explorewithme.ewmservice.event.validator.EventValidator;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundException;
 import ru.practicum.explorewithme.ewmservice.exception.model.EntityStateConflictException;
 import ru.practicum.explorewithme.ewmservice.exception.model.ForbiddenAccessTypeException;
+import ru.practicum.explorewithme.ewmservice.exception.model.WrongParameterIdsListException;
 import ru.practicum.explorewithme.ewmservice.request.service.RequestService;
 import ru.practicum.explorewithme.ewmservice.user.model.User;
 import ru.practicum.explorewithme.ewmservice.user.repository.UserRepository;
@@ -181,6 +181,7 @@ public class EventServiceImpl implements EventService {
             switch (action) {
                 case PUBLISH_EVENT:
                     event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
                     break;
                 case REJECT_EVENT:
                     event.setState(EventState.CANCELED);
@@ -191,7 +192,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Collection<ResponseFullEventDto> findAdminByCriteria(List<Long> users,
                                                                 List<EventState> states,
@@ -245,7 +245,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Collection<ResponseFullEventDto> findPublicByCriteria(
+    public Collection<ResponseShortEventDto> findPublicByCriteria(
             String text,
             List<Long> categories,
             Boolean paid,
@@ -259,7 +259,10 @@ public class EventServiceImpl implements EventService {
     ) {
         Sort sorting = Sort.by("eventDate").descending();
         Pageable pageable = PageRequest.of(from / size, size, sorting);
-        List<ResponseFullEventDto> fullEventDtos = eventRepository.findAll(
+        if (categories.stream().reduce(0L, Long::sum) < categories.size()) {
+            throw new WrongParameterIdsListException("Wrong category ids");
+        }
+        List<ResponseShortEventDto> fullEventDtos = eventRepository.findAll(
                         byAnnotationAndDescriptionIgnoreCases(text)
                                 .and(byCategoryIn(categories))
                                 .and(byPaid(paid))
@@ -268,7 +271,7 @@ public class EventServiceImpl implements EventService {
                                 .and(byAvailability(onlyAvailable)),
                         pageable
                 ).stream()
-                .map(eventMapper::eventToResponseFullDto)
+                .map(eventMapper::eventToResponseShortDto)
                 .collect(Collectors.toList());
         AddHitDto hit = new AddHitDto(
                 "ewm-main-service",
@@ -277,7 +280,7 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now()
         );
         statsClient.addHit(hit);
-        fullEventDtos.forEach(this::addToFullEventDtoRequestsAndViews);
+        fullEventDtos.forEach(this::addToShortEventDtoRequestsAndViews);
         log.info("Found {} events", fullEventDtos.size());
         return fullEventDtos;
     }
@@ -299,5 +302,33 @@ public class EventServiceImpl implements EventService {
         responseFullEventDto.setViews(
                 views
         );
+    }
+
+    private void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto) {
+        responseShortEventDto.setConfirmedRequests(requestService.getConfirmedRequestCount(responseShortEventDto.getId()));
+        Collection<ResponseStatsDto> statsClientStats = statsClient.getStats(
+                LocalDateTime.now().minusYears(100),
+                LocalDateTime.now().plusYears(100),
+                List.of(String.format("/events/%d", responseShortEventDto.getId())),
+                true
+        );
+        Long views;
+        if (!statsClientStats.isEmpty()) {
+            views = statsClientStats.iterator().next().getHits();
+        } else {
+            views = 0L;
+        }
+        responseShortEventDto.setViews(
+                views
+        );
+    }
+
+    @Override
+    public List<ResponseShortEventDto> findShortDtoByIds(List<Long> ids) {
+        List<ResponseShortEventDto> shortEventDtos = eventRepository.findAll(byIdsIn(ids)).stream()
+                .map(eventMapper::eventToResponseShortDto)
+                .collect(Collectors.toList());
+        shortEventDtos.forEach(this::addToShortEventDtoRequestsAndViews);
+        return shortEventDtos;
     }
 }

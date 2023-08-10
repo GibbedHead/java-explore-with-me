@@ -6,7 +6,7 @@ import ru.practicum.explorewithme.ewmservice.event.model.Event;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,5 +30,5 @@ public class Compilation {
             joinColumns = @JoinColumn(name = "compilation_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id")
     )
-    Set<Event> events;
+    List<Event> events;
 }

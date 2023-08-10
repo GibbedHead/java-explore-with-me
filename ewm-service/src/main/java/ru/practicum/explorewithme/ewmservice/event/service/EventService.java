@@ -30,7 +30,7 @@ public interface EventService {
 
     ResponseFullEventDto findPublicByEventId(Long id, HttpServletRequest request);
 
-    Collection<ResponseFullEventDto> findPublicByCriteria(
+    Collection<ResponseShortEventDto> findPublicByCriteria(
             String text,
             List<Long> categories,
             Boolean paid,
@@ -42,4 +42,6 @@ public interface EventService {
             Integer size,
             HttpServletRequest request
     );
+
+    List<ResponseShortEventDto> findShortDtoByIds(List<Long> ids);
 }

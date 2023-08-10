@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
 import ru.practicum.explorewithme.ewmservice.event.service.EventService;
 import ru.practicum.explorewithme.ewmservice.event.sort.EventSortField;
 
@@ -27,7 +28,7 @@ public class PublicEventController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    Collection<ResponseFullEventDto> findPublicByCriteria(
+    Collection<ResponseShortEventDto> findPublicByCriteria(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,

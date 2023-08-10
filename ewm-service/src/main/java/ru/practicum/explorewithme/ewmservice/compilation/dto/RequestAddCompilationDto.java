@@ -11,14 +11,14 @@ import ru.practicum.explorewithme.ewmservice.event.model.Event;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestAddCompilationDto {
-    Set<Event> events;
+    List<Event> events;
     @JsonSetter(nulls = Nulls.SKIP)
     Boolean pinned = false;
     @NotBlank
