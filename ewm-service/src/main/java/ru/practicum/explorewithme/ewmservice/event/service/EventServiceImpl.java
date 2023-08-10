@@ -259,7 +259,7 @@ public class EventServiceImpl implements EventService {
     ) {
         Sort sorting = Sort.by("eventDate").descending();
         Pageable pageable = PageRequest.of(from / size, size, sorting);
-        if (categories.stream().reduce(0L, Long::sum) < categories.size()) {
+        if (categories != null && categories.stream().reduce(0L, Long::sum) < categories.size()) {
             throw new WrongParameterIdsListException("Wrong category ids");
         }
         List<ResponseShortEventDto> fullEventDtos = eventRepository.findAll(
