@@ -32,6 +32,7 @@ import ru.practicum.explorewithme.statsdto.dto.ResponseStatsDto;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -257,12 +258,26 @@ public class EventServiceImpl implements EventService {
             Integer size,
             HttpServletRequest request
     ) {
-        Sort sorting = Sort.by("eventDate").descending();
-        Pageable pageable = PageRequest.of(from / size, size, sorting);
         if (categories != null && categories.stream().reduce(0L, Long::sum) < categories.size()) {
             throw new WrongParameterIdsListException("Wrong category ids");
         }
-        List<ResponseShortEventDto> fullEventDtos = eventRepository.findAll(
+        Sort sorting;
+        if (sort == null) {
+            sorting = Sort.by("eventDate").descending();
+        } else {
+            switch (sort) {
+                case EVENT_DATE:
+                    sorting = Sort.by("eventDate").descending();
+                    break;
+                case VIEWS:
+                    sorting = Sort.by("id").descending();
+                    break;
+                default:
+                    sorting = Sort.by("id").descending();
+            }
+        }
+        Pageable pageable = PageRequest.of(from / size, size, sorting);
+        List<ResponseShortEventDto> shortEventDtos = eventRepository.findAll(
                         byAnnotationAndDescriptionIgnoreCases(text)
                                 .and(byCategoryIn(categories))
                                 .and(byPaid(paid))
@@ -273,6 +288,10 @@ public class EventServiceImpl implements EventService {
                 ).stream()
                 .map(eventMapper::eventToResponseShortDto)
                 .collect(Collectors.toList());
+        shortEventDtos.forEach(this::addToShortEventDtoRequestsAndViews);
+        if (sort != null && sort.equals(EventSortField.VIEWS)) {
+            shortEventDtos.sort(Comparator.comparing(ResponseShortEventDto::getViews).reversed());
+        }
         AddHitDto hit = new AddHitDto(
                 "ewm-main-service",
                 request.getRequestURI(),
@@ -280,9 +299,8 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now()
         );
         statsClient.addHit(hit);
-        fullEventDtos.forEach(this::addToShortEventDtoRequestsAndViews);
-        log.info("Found {} events", fullEventDtos.size());
-        return fullEventDtos;
+        log.info("Found {} events", shortEventDtos.size());
+        return shortEventDtos;
     }
 
     @Override
