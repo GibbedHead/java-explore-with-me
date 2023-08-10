@@ -24,7 +24,7 @@ public class Compilation {
     String title;
     @NotNull
     Boolean pinned;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name = "events_compilations",
             joinColumns = @JoinColumn(name = "compilation_id", referencedColumnName = "id"),

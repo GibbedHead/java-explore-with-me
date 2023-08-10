@@ -53,11 +53,15 @@ public class Event {
     Boolean requestModeration;
     @Enumerated(EnumType.STRING)
     EventState state;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name = "events_compilations",
             joinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "compilation_id", referencedColumnName = "id")
     )
     Set<Compilation> compilations;
+
+    public Event(Long id) {
+        this.id = id;
+    }
 }

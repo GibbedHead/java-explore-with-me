@@ -12,6 +12,7 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "compilations", ignore = true)
     Event addDtoToEvent(RequestAddEventDto addEventDto);
 
     @Mapping(source = "category", target = "id")
@@ -32,6 +33,7 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "compilations", ignore = true)
     void updateEventFromRequestUpdateDto(RequestUpdateEventDto updateEventDto, @MappingTarget Event event);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -40,5 +42,6 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "compilations", ignore = true)
     void updateEventFromAdminRequestUpdateDto(RequestUpdateEventAdminDto updateEventDto, @MappingTarget Event event);
 }
