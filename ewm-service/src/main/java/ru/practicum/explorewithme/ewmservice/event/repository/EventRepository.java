@@ -16,6 +16,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public interface EventRepository extends JpaRepository<Event, Long>,
         JpaSpecificationExecutor<Event> {
@@ -64,13 +65,10 @@ public interface EventRepository extends JpaRepository<Event, Long>,
         }
 
         static Specification<Event> byRangeStart(LocalDateTime rangeStart) {
-            return (root, query, builder) -> {
-                if (rangeStart != null) {
-                    return builder.greaterThanOrEqualTo(root.get(Event_.eventDate), rangeStart);
-                } else {
-                    return builder.and();
-                }
-            };
+            return (root, query, builder) -> builder.greaterThanOrEqualTo(
+                    root.get(Event_.eventDate),
+                    Objects.requireNonNullElseGet(rangeStart, LocalDateTime::now)
+            );
         }
 
         static Specification<Event> byRangeEnd(LocalDateTime rangeEnd) {
@@ -131,6 +129,10 @@ public interface EventRepository extends JpaRepository<Event, Long>,
                     return builder.and();
                 }
             };
+        }
+
+        static Specification<Event> onlyPublished() {
+            return (root, query, builder) -> builder.equal(root.get(Event_.state), EventState.PUBLISHED);
         }
     }
 }

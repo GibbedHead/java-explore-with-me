@@ -283,7 +283,8 @@ public class EventServiceImpl implements EventService {
                                 .and(byPaid(paid))
                                 .and(byRangeStart(rangeStart))
                                 .and(byRangeEnd(rangeEnd))
-                                .and(byAvailability(onlyAvailable)),
+                                .and(byAvailability(onlyAvailable))
+                                .and(onlyPublished()),
                         pageable
                 ).stream()
                 .map(eventMapper::eventToResponseShortDto)
