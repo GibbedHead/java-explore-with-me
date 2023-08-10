@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.ewmservice.compilation.dto.RequestAddCompilationDto;
+import ru.practicum.explorewithme.ewmservice.compilation.dto.RequestUpdateCompilationDto;
 import ru.practicum.explorewithme.ewmservice.compilation.dto.ResponseCompilationDto;
 import ru.practicum.explorewithme.ewmservice.compilation.service.CompilationService;
 
@@ -25,6 +26,7 @@ public class AdminCompilationController {
     ResponseCompilationDto add(
             @Valid @RequestBody RequestAddCompilationDto addCompilationDto
     ) {
+        log.info("Add compilation request: {}", addCompilationDto);
         return compilationService.add(addCompilationDto);
     }
 
@@ -33,8 +35,19 @@ public class AdminCompilationController {
     ResponseCompilationDto update(
             @Positive
             @PathVariable Long compId,
-            @Valid @RequestBody RequestAddCompilationDto addCompilationDto
+            @Valid @RequestBody RequestUpdateCompilationDto updateCompilationDto
     ) {
-        return null;
+        log.info("Update compilation id={} request: {}", compId, updateCompilationDto);
+        return compilationService.update(compId, updateCompilationDto);
+    }
+
+    @DeleteMapping("/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void delete(
+            @Positive
+            @PathVariable Long compId
+    ) {
+        log.info("Delete compilation id={} request", compId);
+        compilationService.deleteById(compId);
     }
 }

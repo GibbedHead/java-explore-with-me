@@ -3,10 +3,12 @@ package ru.practicum.explorewithme.ewmservice.compilation.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.ewmservice.compilation.dto.RequestAddCompilationDto;
+import ru.practicum.explorewithme.ewmservice.compilation.dto.RequestUpdateCompilationDto;
 import ru.practicum.explorewithme.ewmservice.compilation.dto.ResponseCompilationDto;
 import ru.practicum.explorewithme.ewmservice.compilation.mapper.CompilationMapper;
 import ru.practicum.explorewithme.ewmservice.compilation.model.Compilation;
@@ -26,6 +28,7 @@ import static ru.practicum.explorewithme.ewmservice.compilation.repository.Compi
 @RequiredArgsConstructor
 @Slf4j
 public class CompilationServiceImpl implements CompilationService {
+    public static final String COMPILATION_NOT_FOUND_MESSAGE = "Compilation id#%d not found";
     private final EventService eventService;
     private final CompilationRepository compilationRepository;
     private final CompilationMapper compilationMapper = Mappers.getMapper(CompilationMapper.class);
@@ -35,12 +38,14 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation savedCompilation = compilationRepository.save(
                 compilationMapper.addDtoToCompilation(addCompilationDto)
         );
-        List<ResponseShortEventDto> shortDtoByIds = eventService.findShortDtoByIds(
-                savedCompilation.getEvents().stream().map(Event::getId).collect(Collectors.toList())
-        );
         log.info("Compilation saved: {}", savedCompilation);
         ResponseCompilationDto responseCompilationDto = compilationMapper.compilationToResponseDto(savedCompilation);
-        responseCompilationDto.setEvents(shortDtoByIds);
+        if (addCompilationDto.getEvents() != null && !addCompilationDto.getEvents().isEmpty()) {
+            List<ResponseShortEventDto> shortDtoByIds = eventService.findShortDtoByIds(
+                    savedCompilation.getEvents().stream().map(Event::getId).collect(Collectors.toList())
+            );
+            responseCompilationDto.setEvents(shortDtoByIds);
+        }
         return responseCompilationDto;
     }
 
@@ -58,6 +63,7 @@ public class CompilationServiceImpl implements CompilationService {
                                         eventService::addToShortEventDtoRequestsAndViews
                                 )
                 );
+        log.info("Found {} compilations", responseCompilationDtos.size());
         return responseCompilationDtos;
     }
 
@@ -65,7 +71,7 @@ public class CompilationServiceImpl implements CompilationService {
     public ResponseCompilationDto findById(Long compId) {
         Compilation foundCompilation = compilationRepository.findById(compId).orElseThrow(
                 () -> new EntityNotFoundException(String.format(
-                        "Compilation id#%d not found",
+                        COMPILATION_NOT_FOUND_MESSAGE,
                         compId
                 ))
         );
@@ -73,6 +79,43 @@ public class CompilationServiceImpl implements CompilationService {
                 foundCompilation
         );
         responseCompilationDto.getEvents().forEach(eventService::addToShortEventDtoRequestsAndViews);
+        log.info("Compilation found: {}", foundCompilation);
         return responseCompilationDto;
+    }
+
+    @Override
+    public ResponseCompilationDto update(Long compId, RequestUpdateCompilationDto updateCompilationDto) {
+        Compilation foundCompilation = compilationRepository.findById(compId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        COMPILATION_NOT_FOUND_MESSAGE,
+                        compId
+                ))
+        );
+        compilationMapper.updateCompilationFromRequestUpdateDto(updateCompilationDto, foundCompilation);
+        if (updateCompilationDto.getEvents() != null && !updateCompilationDto.getEvents().isEmpty()) {
+            List<Event> updatedEvents = eventService.findByIds(
+                    updateCompilationDto.getEvents().stream()
+                            .map(Event::getId)
+                            .collect(Collectors.toList())
+            );
+            foundCompilation.setEvents(updatedEvents);
+        }
+        Compilation updatedCompilation = compilationRepository.save(foundCompilation);
+        log.info("Compilation updated: {}", updatedCompilation);
+        ResponseCompilationDto responseCompilationDto = compilationMapper.compilationToResponseDto(updatedCompilation);
+        responseCompilationDto.getEvents().forEach(eventService::addToShortEventDtoRequestsAndViews);
+        return responseCompilationDto;
+    }
+
+    @Override
+    public void deleteById(Long compId) {
+        try {
+            compilationRepository.deleteById(compId);
+            log.info("Compilation id#{} deleted", compId);
+        } catch (EmptyResultDataAccessException e) {
+            String message = String.format(COMPILATION_NOT_FOUND_MESSAGE, compId);
+            log.error(message);
+            throw new EntityNotFoundException(message);
+        }
     }
 }

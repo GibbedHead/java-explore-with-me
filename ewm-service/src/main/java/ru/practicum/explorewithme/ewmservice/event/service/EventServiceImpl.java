@@ -333,4 +333,9 @@ public class EventServiceImpl implements EventService {
         shortEventDtos.forEach(this::addToShortEventDtoRequestsAndViews);
         return shortEventDtos;
     }
+
+    @Override
+    public List<Event> findByIds(List<Long> ids) {
+        return eventRepository.findAll(byIdsIn(ids));
+    }
 }

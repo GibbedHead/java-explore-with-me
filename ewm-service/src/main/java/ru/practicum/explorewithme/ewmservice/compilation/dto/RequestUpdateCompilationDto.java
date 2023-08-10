@@ -21,7 +21,6 @@ public class RequestUpdateCompilationDto {
     List<Event> events;
     @JsonSetter(nulls = Nulls.SKIP)
     Boolean pinned = false;
-    @NotBlank
     @Size(min = 1, max = 50, message = "Title length must be between 1 and 50")
     String title;
 }

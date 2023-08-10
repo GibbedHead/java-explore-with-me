@@ -29,6 +29,7 @@ public class PublicCompilationController {
             @Positive(message = "Size parameter must be positive")
             @RequestParam(defaultValue = "10") Integer size
     ) {
+        log.info("Find all compilation request by:\n\tpinned={}\n\tfrom={}\n\tsize={}", pinned, from, size);
         return compilationService.findAllPaged(pinned, from, size);
     }
 
@@ -38,6 +39,7 @@ public class PublicCompilationController {
             @Positive
             @PathVariable Long compId
     ) {
+        log.info("Find compilation request by id = {}", compId);
         return compilationService.findById(compId);
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.explorewithme.ewmservice.event.service;
 
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
+import ru.practicum.explorewithme.ewmservice.event.model.Event;
 import ru.practicum.explorewithme.ewmservice.event.sort.EventSortField;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 
@@ -44,6 +45,8 @@ public interface EventService {
     );
 
     List<ResponseShortEventDto> findShortDtoByIds(List<Long> ids);
+
+    List<Event> findByIds(List<Long> ids);
 
     void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto);
 
