@@ -38,7 +38,7 @@ public class RequestAddEventDto {
     @NotNull
     Location location;
     @JsonSetter(nulls = Nulls.SKIP)
-    Boolean paid = false;
+    boolean paid = false;
     @JsonSetter(nulls = Nulls.SKIP)
     @PositiveOrZero
     Integer participantLimit = 0;
