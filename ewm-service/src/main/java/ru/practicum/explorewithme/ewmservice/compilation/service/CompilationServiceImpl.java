@@ -20,6 +20,7 @@ import ru.practicum.explorewithme.ewmservice.exception.model.EntityNotFoundExcep
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.practicum.explorewithme.ewmservice.compilation.repository.CompilationRepository.Specifications.byPinned;
@@ -41,7 +42,7 @@ public class CompilationServiceImpl implements CompilationService {
         log.info("Compilation saved: {}", savedCompilation);
         ResponseCompilationDto responseCompilationDto = compilationMapper.compilationToResponseDto(savedCompilation);
         if (addCompilationDto.getEvents() != null && !addCompilationDto.getEvents().isEmpty()) {
-            List<ResponseShortEventDto> shortDtoByIds = eventService.findShortDtoByIds(
+            Set<ResponseShortEventDto> shortDtoByIds = eventService.findShortDtoByIds(
                     savedCompilation.getEvents().stream().map(Event::getId).collect(Collectors.toList())
             );
             responseCompilationDto.setEvents(shortDtoByIds);
@@ -93,7 +94,7 @@ public class CompilationServiceImpl implements CompilationService {
         );
         compilationMapper.updateCompilationFromRequestUpdateDto(updateCompilationDto, foundCompilation);
         if (updateCompilationDto.getEvents() != null && !updateCompilationDto.getEvents().isEmpty()) {
-            List<Event> updatedEvents = eventService.findByIds(
+            Set<Event> updatedEvents = eventService.findByIds(
                     updateCompilationDto.getEvents().stream()
                             .map(Event::getId)
                             .collect(Collectors.toList())

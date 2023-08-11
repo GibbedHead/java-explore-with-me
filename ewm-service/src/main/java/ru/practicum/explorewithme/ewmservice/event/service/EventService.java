@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface EventService {
     ResponseFullEventDto addEvent(Long userId, RequestAddEventDto addEventDto);
@@ -44,9 +45,9 @@ public interface EventService {
             HttpServletRequest request
     );
 
-    List<ResponseShortEventDto> findShortDtoByIds(List<Long> ids);
+    Set<ResponseShortEventDto> findShortDtoByIds(List<Long> ids);
 
-    List<Event> findByIds(List<Long> ids);
+    Set<Event> findByIds(List<Long> ids);
 
     void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto);
 

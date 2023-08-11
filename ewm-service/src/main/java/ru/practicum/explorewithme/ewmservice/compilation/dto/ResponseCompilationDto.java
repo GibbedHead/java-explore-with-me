@@ -4,7 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
 
-import java.util.Collection;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,5 +16,5 @@ public class ResponseCompilationDto {
     Long id;
     String title;
     Boolean pinned;
-    Collection<ResponseShortEventDto> events;
+    Set<ResponseShortEventDto> events;
 }

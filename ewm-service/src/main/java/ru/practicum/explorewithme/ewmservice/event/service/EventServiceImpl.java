@@ -31,10 +31,7 @@ import ru.practicum.explorewithme.statsdto.dto.ResponseStatsDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.practicum.explorewithme.ewmservice.event.repository.EventRepository.Specifications.*;
@@ -345,16 +342,16 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<ResponseShortEventDto> findShortDtoByIds(List<Long> ids) {
-        List<ResponseShortEventDto> shortEventDtos = eventRepository.findAll(byIdsIn(ids)).stream()
+    public Set<ResponseShortEventDto> findShortDtoByIds(List<Long> ids) {
+        Set<ResponseShortEventDto> shortEventDtos = eventRepository.findAll(byIdsIn(ids)).stream()
                 .map(eventMapper::eventToResponseShortDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         shortEventDtos.forEach(this::addToShortEventDtoRequestsAndViews);
         return shortEventDtos;
     }
 
     @Override
-    public List<Event> findByIds(List<Long> ids) {
-        return eventRepository.findAll(byIdsIn(ids));
+    public Set<Event> findByIds(List<Long> ids) {
+        return new HashSet<>(eventRepository.findAll(byIdsIn(ids)));
     }
 }
