@@ -9,7 +9,6 @@ services:
     depends_on:
       - stats-db
     environment:
-      - TZ:Europe/Moscow
       - POSTGRES_HOST=stats-db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=ewm-statistics
@@ -26,7 +25,6 @@ services:
       - POSTGRES_DB=ewm-statistics
       - POSTGRES_USER=ewm-statistics
       - POSTGRES_PASSWORD=ewm-statistics
-      - TZ:Europe/Moscow
 
   ewm-service:
     build: ewm-service
@@ -34,16 +32,17 @@ services:
     container_name: ewm-service
     ports:
       - "8080:8080"
+      - "5005:5005"
     depends_on:
       - ewm-db
       - stats-server
     environment:
-      - TZ:Europe/Moscow
       - POSTGRES_HOST=ewm-db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=ewm
       - POSTGRES_USER=ewm
       - POSTGRES_PASSWORD=ewm
+      - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,address=*:5005,server=y,suspend=n"
     restart: on-failure
 
   ewm-db:
@@ -55,4 +54,3 @@ services:
       - POSTGRES_DB=ewm
       - POSTGRES_USER=ewm
       - POSTGRES_PASSWORD=ewm
-      - TZ:Europe/Moscow
