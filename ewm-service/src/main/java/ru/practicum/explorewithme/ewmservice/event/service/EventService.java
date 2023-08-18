@@ -56,4 +56,6 @@ public interface EventService {
     ResponseShortModerationCommentDto addModerationComment(
             Long eventId, RequestAddModerationCommentDto addModerationCommentDto
     );
+
+    Collection<ResponseFullEventDto> findPendingEventsPaged(Integer from, Integer size);
 }

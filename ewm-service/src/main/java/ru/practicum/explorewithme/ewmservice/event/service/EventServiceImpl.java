@@ -377,4 +377,14 @@ public class EventServiceImpl implements EventService {
         log.info("Moderation comment saved: {}", savedModerationComment);
         return moderationCommentMapper.moderationCommentToResponseShortDto(savedModerationComment);
     }
+
+    @Override
+    public Collection<ResponseFullEventDto> findPendingEventsPaged(Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("eventDate").ascending());
+        List<ResponseFullEventDto> pendingEvents = eventRepository.findByState(EventState.PENDING, pageable).stream()
+                .map(eventMapper::eventToResponseFullDto)
+                .collect(Collectors.toList());
+        log.info("Found {} events", pendingEvents.size());
+        return pendingEvents;
+    }
 }

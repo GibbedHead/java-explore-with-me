@@ -84,4 +84,15 @@ public class AdminEventController {
         return eventService.addModerationComment(eventId, addModerationCommentDto);
     }
 
+    @GetMapping("/pending")
+    @ResponseStatus(HttpStatus.OK)
+    Collection<ResponseFullEventDto> findPendingEvents(
+            @PositiveOrZero(message = "From parameter must be positive or zero")
+            @RequestParam(defaultValue = "0") Integer from,
+            @Positive(message = "Size parameter must be positive")
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        log.info("Get all pending events request from {} size {}", from, size);
+        return eventService.findPendingEventsPaged(from, size);
+    }
 }
