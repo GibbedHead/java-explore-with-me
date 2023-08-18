@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
@@ -104,6 +105,7 @@ public class EventServiceImpl implements EventService {
         return fullEventDto;
     }
 
+    @Transactional
     @Override
     public ResponseFullEventDto updateEvent(Long userId, Long eventId, RequestUpdateEventDto updateEventDto) {
         Event foundEvent = eventRepository.findById(eventId).orElseThrow(
@@ -147,6 +149,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @Transactional
     @Override
     public ResponseFullEventDto adminUpdateEvent(Long eventId, RequestUpdateEventAdminDto updateEventAdminDto) {
         Event foundEvent = eventRepository.findById(eventId).orElseThrow(

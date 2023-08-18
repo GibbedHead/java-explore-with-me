@@ -233,6 +233,115 @@
       "response": []
     },
     {
+      "name": "Проверка удаления комментариев администратора при публикации события",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const main = async () => {\r",
+              "    const api = new API(pm);\r",
+              "    const rnd = new RandomUtils();\r",
+              "\r",
+              "    let moderationComment;\r",
+              "    try {\r",
+              "        const user = await api.addUser(rnd.getUser());\r",
+              "        pm.collectionVariables.set(\"userId\", user.id);\r",
+              "        const category = await api.addCategory(rnd.getCategory());\r",
+              "        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+              "        pm.collectionVariables.set(\"eventId\", event.id);\r",
+              "        \r",
+              "\r",
+              "        await api.returnEventToEdit(event.id);\r",
+              "        const comment = await api.addModerationComment(event.id, rnd.getModerationComment());\r",
+              "\r",
+              "        let event2 = rnd.getEvent(category.id)\r",
+              "        event2.stateAction = \"SEND_TO_REVIEW\";\r",
+              "\r",
+              "        await api.updateEvent(user.id, event.id, event2);\r",
+              "\r",
+              "        await api.publishEvent(event.id);\r",
+              "    } catch(err) {\r",
+              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+              "    }\r",
+              "\r",
+              "   \r",
+              "};\r",
+              "\r",
+              "const interval = setInterval(() => {}, 1000);\r",
+              "\r",
+              "setTimeout(async () => \r",
+              "    {\r",
+              "        try {\r",
+              "            await main();\r",
+              "        } catch (e) {\r",
+              "            console.error(e);\r",
+              "        } finally {\r",
+              "            clearInterval(interval);\r",
+              "        }\r",
+              "    },  \r",
+              "    100 \r",
+              ");"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.have.status(200);  \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Список коммнетариев должен быть пустым\", function () {\r",
+              "    pm.expect(target.length).to.eql(0);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/events/:eventId/moderation-comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ":eventId",
+            "moderation-comments"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "{{userId}}"
+            },
+            {
+              "key": "eventId",
+              "value": "{{eventId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Получение администратором комментариев возвращенному на доработку событию",
       "event": [
         {
@@ -339,7 +448,7 @@
       "response": []
     },
     {
-      "name": "Получение списка событий для модерации",
+      "name": "Получение администратором списка событий для модерации",
       "event": [
         {
           "listen": "prerequest",
@@ -578,6 +687,10 @@
           "",
           "    async addEvent(userId, event, verbose=null) {",
           "        return this.post(\"/users/\" + userId + \"/events\", event, \"Ошибка при добавлении нового события: \", verbose);",
+          "    }",
+          "",
+          "    async updateEvent(userId, eventId, event, verbose=null) {",
+          "        return this.patch(\"/users/\" + userId + \"/events/\" + eventId, event, \"Ошибка при обновлении события: \", verbose);",
           "    }",
           "",
           "    async addCompilation(compilation, verbose=null) {",
