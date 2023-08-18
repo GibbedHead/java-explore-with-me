@@ -163,11 +163,15 @@ public class EventServiceImpl implements EventService {
             throw new EntityStateConflictException("Only pending events can be published.");
         }
         if (
-                updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.REJECT_EVENT
+                (
+                        updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.REJECT_EVENT
+                                ||
+                                updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.REQUIRE_EDIT
+                )
                         &&
                         foundEvent.getState() == EventState.PUBLISHED
         ) {
-            throw new EntityStateConflictException("Can't reject published event.");
+            throw new EntityStateConflictException("Can't reject or return to edit published event.");
         }
         eventMapper.updateEventFromAdminRequestUpdateDto(updateEventAdminDto, foundEvent);
         adminUpdateEventState(updateEventAdminDto.getStateAction(), foundEvent);
@@ -182,6 +186,9 @@ public class EventServiceImpl implements EventService {
     private void adminUpdateEventState(EventModerationStateChangeAdminAction action, Event event) {
         if (action != null) {
             switch (action) {
+                case REQUIRE_EDIT:
+                    event.setState(EventState.EDIT_REQUIRED);
+                    break;
                 case PUBLISH_EVENT:
                     event.setState(EventState.PUBLISHED);
                     event.setPublishedOn(LocalDateTime.now());
