@@ -7,12 +7,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
 import ru.practicum.explorewithme.ewmservice.event.mapper.EventMapper;
+import ru.practicum.explorewithme.ewmservice.event.mapper.ModerationCommentMapper;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
+import ru.practicum.explorewithme.ewmservice.event.model.ModerationComment;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
+import ru.practicum.explorewithme.ewmservice.event.repository.ModerationCommentRepository;
 import ru.practicum.explorewithme.ewmservice.event.sort.EventSortField;
 import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAction;
 import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAdminAction;
@@ -44,9 +48,11 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ModerationCommentRepository moderationCommentRepository;
     private final RequestService requestService;
     private final StatsClient statsClient;
     private final EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
+    private final ModerationCommentMapper moderationCommentMapper = Mappers.getMapper(ModerationCommentMapper.class);
 
     @Override
     public ResponseFullEventDto addEvent(Long userId, RequestAddEventDto addEventDto) {
@@ -99,6 +105,7 @@ public class EventServiceImpl implements EventService {
         return fullEventDto;
     }
 
+    @Transactional
     @Override
     public ResponseFullEventDto updateEvent(Long userId, Long eventId, RequestUpdateEventDto updateEventDto) {
         Event foundEvent = eventRepository.findById(eventId).orElseThrow(
@@ -142,6 +149,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @Transactional
     @Override
     public ResponseFullEventDto adminUpdateEvent(Long eventId, RequestUpdateEventAdminDto updateEventAdminDto) {
         Event foundEvent = eventRepository.findById(eventId).orElseThrow(
@@ -158,11 +166,15 @@ public class EventServiceImpl implements EventService {
             throw new EntityStateConflictException("Only pending events can be published.");
         }
         if (
-                updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.REJECT_EVENT
+                (
+                        updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.REJECT_EVENT
+                                ||
+                                updateEventAdminDto.getStateAction() == EventModerationStateChangeAdminAction.REQUIRE_EDIT
+                )
                         &&
                         foundEvent.getState() == EventState.PUBLISHED
         ) {
-            throw new EntityStateConflictException("Can't reject published event.");
+            throw new EntityStateConflictException("Can't reject or return to edit published event.");
         }
         eventMapper.updateEventFromAdminRequestUpdateDto(updateEventAdminDto, foundEvent);
         adminUpdateEventState(updateEventAdminDto.getStateAction(), foundEvent);
@@ -177,9 +189,13 @@ public class EventServiceImpl implements EventService {
     private void adminUpdateEventState(EventModerationStateChangeAdminAction action, Event event) {
         if (action != null) {
             switch (action) {
+                case REQUIRE_EDIT:
+                    event.setState(EventState.EDIT_REQUIRED);
+                    break;
                 case PUBLISH_EVENT:
                     event.setState(EventState.PUBLISHED);
                     event.setPublishedOn(LocalDateTime.now());
+                    deleteModerationCommentsByEvent(event);
                     break;
                 case REJECT_EVENT:
                     event.setState(EventState.CANCELED);
@@ -353,5 +369,54 @@ public class EventServiceImpl implements EventService {
     @Override
     public Set<Event> findByIds(List<Long> ids) {
         return new HashSet<>(eventRepository.findAll(byIdsIn(ids)));
+    }
+
+    @Override
+    public ResponseShortModerationCommentDto addModerationComment(
+            Long eventId, RequestAddModerationCommentDto addModerationCommentDto
+    ) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        EVENT_NOT_FOUND_MESSAGE,
+                        eventId
+                ))
+        );
+        ModerationComment moderationComment = moderationCommentMapper.addDtoToModerationComment(addModerationCommentDto);
+        moderationComment.setEvent(event);
+        moderationComment.setCreatedAt(LocalDateTime.now());
+        ModerationComment savedModerationComment = moderationCommentRepository.save(moderationComment);
+        log.info("Moderation comment saved: {}", savedModerationComment);
+        return moderationCommentMapper.moderationCommentToResponseShortDto(savedModerationComment);
+    }
+
+    @Override
+    public Collection<ResponseFullEventDto> findPendingEventsPaged(Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("eventDate").ascending());
+        List<ResponseFullEventDto> pendingEvents = eventRepository.findByState(EventState.PENDING, pageable).stream()
+                .map(eventMapper::eventToResponseFullDto)
+                .collect(Collectors.toList());
+        log.info("Found {} events", pendingEvents.size());
+        return pendingEvents;
+    }
+
+    @Override
+    public Collection<ResponseShortModerationCommentDto> findEventModerationComments(Long eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        EVENT_NOT_FOUND_MESSAGE,
+                        eventId
+                ))
+        );
+        List<ModerationComment> moderationComment = moderationCommentRepository.findByEvent(event);
+        log.info("Found {} moderation comments for event id = {}", moderationComment.size(), eventId);
+        return moderationComment.stream()
+                .map(moderationCommentMapper::moderationCommentToResponseShortDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteModerationCommentsByEvent(Event event) {
+        Long deleteCommentsCount = moderationCommentRepository.deleteByEvent(event);
+        log.info("Deleted {} moderation comments for event id = {}", deleteCommentsCount, event.getId());
     }
 }

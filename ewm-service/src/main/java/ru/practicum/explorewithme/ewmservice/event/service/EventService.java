@@ -52,4 +52,14 @@ public interface EventService {
     void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto);
 
     void addToFullEventDtoRequestsAndViews(ResponseFullEventDto responseFullEventDto);
+
+    ResponseShortModerationCommentDto addModerationComment(
+            Long eventId, RequestAddModerationCommentDto addModerationCommentDto
+    );
+
+    Collection<ResponseFullEventDto> findPendingEventsPaged(Integer from, Integer size);
+
+    Collection<ResponseShortModerationCommentDto> findEventModerationComments(Long eventId);
+
+    void deleteModerationCommentsByEvent(Event event);
 }

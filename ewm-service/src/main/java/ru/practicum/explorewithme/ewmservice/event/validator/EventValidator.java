@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventValidator {
     public static boolean isValidStateForUpdate(Event event) {
-        List<EventState> validUpdateStates = List.of(EventState.PENDING, EventState.CANCELED);
+        List<EventState> validUpdateStates = List.of(EventState.EDIT_REQUIRED, EventState.PENDING, EventState.CANCELED);
         return validUpdateStates.contains(event.getState());
     }
 }
