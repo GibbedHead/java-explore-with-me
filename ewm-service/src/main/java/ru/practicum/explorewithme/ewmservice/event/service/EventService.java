@@ -52,4 +52,8 @@ public interface EventService {
     void addToShortEventDtoRequestsAndViews(ResponseShortEventDto responseShortEventDto);
 
     void addToFullEventDtoRequestsAndViews(ResponseFullEventDto responseFullEventDto);
+
+    ResponseShortModerationCommentDto addModerationComment(
+            Long eventId, RequestAddModerationCommentDto addModerationCommentDto
+    );
 }

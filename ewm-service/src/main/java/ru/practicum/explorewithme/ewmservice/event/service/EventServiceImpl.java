@@ -11,8 +11,11 @@ import ru.practicum.explorewithme.ewmservice.category.model.Category;
 import ru.practicum.explorewithme.ewmservice.category.repository.CategoryRepository;
 import ru.practicum.explorewithme.ewmservice.event.dto.*;
 import ru.practicum.explorewithme.ewmservice.event.mapper.EventMapper;
+import ru.practicum.explorewithme.ewmservice.event.mapper.ModerationCommentMapper;
 import ru.practicum.explorewithme.ewmservice.event.model.Event;
+import ru.practicum.explorewithme.ewmservice.event.model.ModerationComment;
 import ru.practicum.explorewithme.ewmservice.event.repository.EventRepository;
+import ru.practicum.explorewithme.ewmservice.event.repository.ModerationCommentRepository;
 import ru.practicum.explorewithme.ewmservice.event.sort.EventSortField;
 import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAction;
 import ru.practicum.explorewithme.ewmservice.event.state.EventModerationStateChangeAdminAction;
@@ -44,9 +47,11 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ModerationCommentRepository moderationCommentRepository;
     private final RequestService requestService;
     private final StatsClient statsClient;
     private final EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
+    private final ModerationCommentMapper moderationCommentMapper = Mappers.getMapper(ModerationCommentMapper.class);
 
     @Override
     public ResponseFullEventDto addEvent(Long userId, RequestAddEventDto addEventDto) {
@@ -353,5 +358,23 @@ public class EventServiceImpl implements EventService {
     @Override
     public Set<Event> findByIds(List<Long> ids) {
         return new HashSet<>(eventRepository.findAll(byIdsIn(ids)));
+    }
+
+    @Override
+    public ResponseShortModerationCommentDto addModerationComment(
+            Long eventId, RequestAddModerationCommentDto addModerationCommentDto
+    ) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        EVENT_NOT_FOUND_MESSAGE,
+                        eventId
+                ))
+        );
+        ModerationComment moderationComment = moderationCommentMapper.addDtoToModerationComment(addModerationCommentDto);
+        moderationComment.setEvent(event);
+        moderationComment.setCreatedAt(LocalDateTime.now());
+        ModerationComment savedModerationComment = moderationCommentRepository.save(moderationComment);
+        log.info("Moderation comment saved: {}", savedModerationComment);
+        return moderationCommentMapper.moderationCommentToResponseShortDto(savedModerationComment);
     }
 }

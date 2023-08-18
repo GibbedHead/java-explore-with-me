@@ -6,8 +6,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.ewmservice.event.dto.RequestAddModerationCommentDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.RequestUpdateEventAdminDto;
 import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortModerationCommentDto;
 import ru.practicum.explorewithme.ewmservice.event.service.EventService;
 import ru.practicum.explorewithme.ewmservice.event.state.EventState;
 
@@ -70,6 +72,16 @@ public class AdminEventController {
                 from,
                 size
         );
+    }
+
+    @PostMapping("/{eventId}/moderation-comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    ResponseShortModerationCommentDto addModerationComment(
+            @PathVariable Long eventId,
+            @Valid @RequestBody RequestAddModerationCommentDto addModerationCommentDto
+    ) {
+        log.info("Add moderation comment request to event id = {}: {}", eventId, addModerationCommentDto);
+        return eventService.addModerationComment(eventId, addModerationCommentDto);
     }
 
 }
