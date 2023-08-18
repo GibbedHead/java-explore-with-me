@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "80711664-8d7a-4ffd-82fa-cc9406f8f3e4",
+    "_postman_id": "d9cffdba-f5d4-4dcc-8278-5f5fbe1a3f1c",
     "name": "Test Explore With Me - Moderation Enhancement",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "25834452"
@@ -144,7 +144,7 @@
               "        await api.returnEventToEdit(event.id);\r",
               "        const comment = await api.addModerationComment(event.id, rnd.getModerationComment());\r",
               "\r",
-              "        pm.collectionVariables.set('response', comment);\r",
+              "        pm.collectionVariables.set('response', JSON.stringify(comment));\r",
               "    } catch(err) {\r",
               "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
               "    }\r",
@@ -180,7 +180,7 @@
               "    pm.response.to.be.json;\r",
               "});\r",
               "\r",
-              "const source = pm.collectionVariables.get('response');\r",
+              "const source = JSON.parse(pm.collectionVariables.get('response'));\r",
               "const target = pm.response.json()[0];\r",
               "\r",
               "pm.test(\"Комментарий должен содержать поля: id, comment\", function () {\r",
@@ -364,7 +364,7 @@
               "        await api.returnEventToEdit(event.id);\r",
               "        const comment = await api.addModerationComment(event.id, rnd.getModerationComment());\r",
               "\r",
-              "        pm.collectionVariables.set('response', comment);\r",
+              "        pm.collectionVariables.set('response', JSON.stringify(comment));\r",
               "    } catch(err) {\r",
               "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
               "    }\r",
@@ -400,7 +400,7 @@
               "    pm.response.to.be.json;\r",
               "});\r",
               "\r",
-              "const source = pm.collectionVariables.get('response');\r",
+              "const source = JSON.parse(pm.collectionVariables.get('response'));\r",
               "const target = pm.response.json()[0];\r",
               "\r",
               "pm.test(\"Комментарий должен содержать поля: id, comment\", function () {\r",
