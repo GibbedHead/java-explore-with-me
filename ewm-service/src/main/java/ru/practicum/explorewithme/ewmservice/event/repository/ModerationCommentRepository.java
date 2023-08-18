@@ -10,4 +10,6 @@ public interface ModerationCommentRepository extends JpaRepository<ModerationCom
 
     List<ModerationComment> findByEvent(Event event);
 
+    Long deleteByEvent(Event event);
+
 }

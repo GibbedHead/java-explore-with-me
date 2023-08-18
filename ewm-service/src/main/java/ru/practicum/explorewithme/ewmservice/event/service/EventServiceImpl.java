@@ -192,6 +192,7 @@ public class EventServiceImpl implements EventService {
                 case PUBLISH_EVENT:
                     event.setState(EventState.PUBLISHED);
                     event.setPublishedOn(LocalDateTime.now());
+                    deleteModerationCommentsByEvent(event);
                     break;
                 case REJECT_EVENT:
                     event.setState(EventState.CANCELED);
@@ -395,6 +396,7 @@ public class EventServiceImpl implements EventService {
         return pendingEvents;
     }
 
+    @Override
     public Collection<ResponseShortModerationCommentDto> findEventModerationComments(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new EntityNotFoundException(String.format(
@@ -407,5 +409,11 @@ public class EventServiceImpl implements EventService {
         return moderationComment.stream()
                 .map(moderationCommentMapper::moderationCommentToResponseShortDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteModerationCommentsByEvent(Event event) {
+        Long deleteCommentsCount = moderationCommentRepository.deleteByEvent(event);
+        log.info("Deleted {} moderation comments for event id = {}", deleteCommentsCount, event.getId());
     }
 }
