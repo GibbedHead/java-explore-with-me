@@ -95,4 +95,11 @@ public class AdminEventController {
         log.info("Get all pending events request from {} size {}", from, size);
         return eventService.findPendingEventsPaged(from, size);
     }
+
+    @GetMapping("/{eventId}/moderation-comments")
+    @ResponseStatus(HttpStatus.OK)
+    Collection<ResponseShortModerationCommentDto> findEventModerationComments(@PathVariable Long eventId) {
+        log.info("Find event moderation comment by event id={} request.", eventId);
+        return eventService.findEventModerationComments(eventId);
+    }
 }
