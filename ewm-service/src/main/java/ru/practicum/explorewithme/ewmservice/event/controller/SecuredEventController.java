@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.ewmservice.event.dto.RequestAddEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.RequestUpdateEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.ResponseFullEventDto;
-import ru.practicum.explorewithme.ewmservice.event.dto.ResponseShortEventDto;
+import ru.practicum.explorewithme.ewmservice.event.dto.*;
 import ru.practicum.explorewithme.ewmservice.event.service.EventService;
 import ru.practicum.explorewithme.ewmservice.request.dto.RequestUpdateRequestStatusDto;
 import ru.practicum.explorewithme.ewmservice.request.dto.ResponseRequestDto;
@@ -95,5 +92,12 @@ public class SecuredEventController {
                 updateRequestStatusDto.getStatus()
         );
         return requestService.updateRequestsStatus(eventId, updateRequestStatusDto);
+    }
+
+    @GetMapping("/{eventId}/moderation-comments")
+    @ResponseStatus(HttpStatus.OK)
+    Collection<ResponseShortModerationCommentDto> findEventModerationComments(@PathVariable Long eventId) {
+        log.info("Find event moderation comment by event id={} request.", eventId);
+        return eventService.findEventModerationComments(eventId);
     }
 }

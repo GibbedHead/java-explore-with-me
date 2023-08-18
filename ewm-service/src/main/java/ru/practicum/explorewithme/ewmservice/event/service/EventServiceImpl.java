@@ -394,4 +394,18 @@ public class EventServiceImpl implements EventService {
         log.info("Found {} events", pendingEvents.size());
         return pendingEvents;
     }
+
+    public Collection<ResponseShortModerationCommentDto> findEventModerationComments(Long eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException(String.format(
+                        EVENT_NOT_FOUND_MESSAGE,
+                        eventId
+                ))
+        );
+        List<ModerationComment> moderationComment = moderationCommentRepository.findByEvent(event);
+        log.info("Found {} moderation comments for event id = {}", moderationComment.size(), eventId);
+        return moderationComment.stream()
+                .map(moderationCommentMapper::moderationCommentToResponseShortDto)
+                .collect(Collectors.toList());
+    }
 }

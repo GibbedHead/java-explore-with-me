@@ -58,4 +58,6 @@ public interface EventService {
     );
 
     Collection<ResponseFullEventDto> findPendingEventsPaged(Integer from, Integer size);
+
+    Collection<ResponseShortModerationCommentDto> findEventModerationComments(Long eventId);
 }
